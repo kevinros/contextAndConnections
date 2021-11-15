@@ -13,6 +13,12 @@ def get_loc(idn):
         comment["link_texts"] = [{"link": rgx.match(lk).group(1), "title_text": rgx.match(lk).group(2)} for lk in links]
     return comment
 
+def recursive_lookup(idn):
+    ret = get_loc(idn)
+    if ret is not None and "kids" in ret.keys():
+        ret["kid_texts"] = [recursive_lookup(i) for i in ret["kids"]]
+    return ret
+
 def get_top():
     return requests.get("https://hacker-news.firebaseio.com/v0/topstories.json").json()
 
