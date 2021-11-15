@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import json
+import regex as re
 
 rgx = re.compile(r"(?:<a href=\")([^\"]*)(?:\"[^>]*>)([^<]*)(?:</a>)")
 
