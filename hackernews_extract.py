@@ -2,12 +2,15 @@ import requests
 from bs4 import BeautifulSoup
 import json
 
+rgx = re.compile(r"(?:<a href=\")([^\"]*)(?:\"[^>]*>)([^<]*)(?:</a>)")
+
 def get_loc(idn):
     comment = requests.get("https://hacker-news.firebaseio.com/v0/item/" + str(idn) + ".json").json()
     if comment is not None and "text" in comment.keys():
         soup = BeautifulSoup(comment["text"], "html.parser")
         comment["text_proc"] = soup.text
-        comment["link_texts"] = [str(x) for x in soup.find_all("a")]
+        links = [str(x) for x in soup.find_all("a")]
+        comment["link_texts"] = [{"link": rgx.match(lk).group(1), "title_text": rgx.match(lk).group(2)} for lk in links]
     return comment
 
 def get_top():
