@@ -12,6 +12,8 @@ Make directory for output (BM25): ```mkdir out/bm25_runs```
 
 Make directory for output (lstm): ```mkdir out/lstm_runs```
 
+Make directory for output (semantic): ```mkdir out/semantic_runs```
+
 Navigate to data helpers directory: ```cd data_helpers```
 
 Set up comment structure: ```python3 format_reddit_comments.py --raw ../data/RC_2009-05 --out ../data/RC_2009-05_formatted.json```
@@ -24,9 +26,12 @@ Assume you are in src directory
 
 Run BM25 baseline: use bm25_baseline.ipynb
 
-Run LSTM: ```python3 neural.py --model lstm --relevance_scores data/relevance_scores.txt --corpus data/encoded_websites.pkl --src_train data/encoded_queries_train.pkl --src_dev data/encoded_queries_dev.pkl --src_test data/encoded_queries_test.pkl --out out/lstm_runs/run.dev.txt```
+Run Semantic baseline: ```python3 neural.py --model semantic_baseline --relevance_scores data/relevance_scores.txt --corpus data/encoded_websites.pkl --src_train data/encoded_queries_train.pkl --src_dev data/encoded_queries_dev.pkl --src_test data/encoded_queries_test.pkl --out out/semantic_runs/```
 
-Evaluate LSTM: ```python3 -m pyserini.eval.trec_eval -m map -m P.1 data/relevance_scores.txt out/lstm_runs/run.dev.txt```
+Run LSTM: ```python3 neural.py --model lstm --relevance_scores data/relevance_scores.txt --corpus data/encoded_websites.pkl --src_train data/encoded_queries_train.pkl --src_dev data/encoded_queries_dev.pkl --src_test data/encoded_queries_test.pkl --out out/lstm_runs/```
+
+Evaluate: ```python3 -m pyserini.eval.trec_eval -m map -m P.1 data/relevance_scores.txt <path to run>```
+
 
 
 ## TODO
