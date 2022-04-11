@@ -39,4 +39,6 @@ Evaluate LSTM: ```python3 -m pyserini.eval.trec_eval -m map -m P.1 data/relevanc
 - [ ] Transformer performance on dev
 - [ ] Combine LSTM test method with semantic search (lots of reused code)
 - [ ] Make test functions search over faiss instead of loading everything at once (only a problem with scale?)
+- [ ] Use a larger, more powerful encoder (and train it?)
+- [ ] Negative samples with seed for LSTM may not be random, instead do it over batch
 
