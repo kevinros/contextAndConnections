@@ -1,10 +1,39 @@
 import argparse
 import os
 import pickle
+from sentence_transformers import util
 
-from parso import split_lines
+
 from models import lstm
 import torch
+
+
+def semantic_baseline(corpus, X_test, k=10):
+    # TODO: combine with LSTM test method
+    run = []
+    # so that we can do cosine scores and recover the actual id of the webpage
+    just_corpus_encodings = [torch.unsqueeze(corpus[x],dim=0) for x in corpus]
+    just_corpus_encodings = torch.cat(just_corpus_encodings)
+
+    webpage_id_map = {}
+    for i,webpage_id in enumerate(corpus):
+        webpage_id_map[i] = webpage_id
+
+
+    for i,query in enumerate(X_test):
+
+        query_id = query['query_id']
+
+        # get the last comment (with the missing URL)
+        x = query['encoding'][-1] 
+
+           
+        cos_scores = util.cos_sim(x, just_corpus_encodings)[0]
+        top_results = torch.topk(cos_scores, k=k)
+        for j, (score, idx) in enumerate(zip(top_results[0], top_results[1])):
+            # 0 Q0 0 1 193.457108 Anserini
+            run.append(' '.join([str(query_id), 'Q0', str(webpage_id_map[idx.item()]), str(j), str(score.item()), 'Semantic Search']))
+    return run
 
 
 if __name__ == '__main__':
@@ -24,6 +53,7 @@ if __name__ == '__main__':
 
     # example usage
     # python3 neural.py --model lstm --relevance_scores data/relevance_scores.txt --corpus data/encoded_websites.pkl --src_train data/encoded_queries_train.pkl --src_dev data/encoded_queries_dev.pkl --src_test data/encoded_queries_test.pkl --out out/lstm_runs/
+    # python3 neural.py --model semantic_baseline --relevance_scores data/relevance_scores.txt --corpus data/encoded_websites.pkl --src_train data/encoded_queries_train.pkl --src_dev data/encoded_queries_dev.pkl --src_test data/encoded_queries_test.pkl --out out/semantic_runs/
 
     os.environ['CUDA_VISIBLE_DEVICES'] = "4,5,6,7"
 
@@ -71,12 +101,15 @@ if __name__ == '__main__':
             print('Total dev loss: ', loss_dev)
         run = trainer.test(src_dev)
 
+        torch.save(model, args.out + 'model')
 
+
+    if args.model == "semantic_baseline":
+        run = semantic_baseline(corpus, src_dev)
 
 
     with open(args.out + 'run.dev.txt', 'w') as f:
         for line in run:
             f.write(line + '\n')
     
-    torch.save(model, args.out + 'model')
 
