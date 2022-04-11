@@ -44,13 +44,10 @@ if __name__ == '__main__':
     if args.model == "lstm":
         input_size = 768
         hidden_size = 768
-        num_layers = 10
-        learning_rate = 1e-3
+        num_layers = 2
+        learning_rate = 1e-4
         warm_up_rate = 0.1
-        epochs = 20
-
-        # for warm up ? 
-            
+        epochs = 10
 
 
         model = lstm.URLSTM(input_size, hidden_size, num_layers)
