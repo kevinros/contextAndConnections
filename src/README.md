@@ -46,4 +46,5 @@ Evaluate: ```python3 -m pyserini.eval.trec_eval -m map -m P.1 data/relevance_sco
 - [ ] Make test functions search over faiss instead of loading everything at once (only a problem with scale?)
 - [ ] Use a larger, more powerful encoder (and train it?)
 - [ ] Negative samples with seed for LSTM may not be random, instead do it over batch
+- [ ] Address scrape error to restrict scraped domains to only those selected, not ones present in comments
 
