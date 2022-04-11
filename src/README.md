@@ -34,4 +34,7 @@ Evaluate LSTM: ```python3 -m pyserini.eval.trec_eval -m map -m P.1 data/relevanc
 - [ ] Add more domains to the data set
 - [ ] Try with newer reddit comments
 - [ ] Add data parallel wrappers
+- [ ] Use model files and place all hyper parameters in there
+- [ ] Semantic search baseline
+- [ ] Transformer performance on dev
 
