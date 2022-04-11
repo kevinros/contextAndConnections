@@ -29,12 +29,12 @@ class LSTMTrainer():
         self.corpus = corpus
         self.query_webpage_map = query_webpage_map
 
-        self.neg_samples = 5
-
+        self.neg_samples = 1
 
     def train(self, X_train):
         total_loss = 0
         self.model.train()
+
         for i,query in enumerate(X_train):
             query_id = query['query_id']
             x = query['encoding']
@@ -47,7 +47,7 @@ class LSTMTrainer():
             pred, (state_h, state_c) = self.model(torch.unsqueeze(x, 1), (state_h, state_c))
 
             condition = torch.tensor(1).to('cuda:0')
-            loss = self.loss_fn(state_h[-1][-1], y, condition)
+            loss = self.loss_fn(pred[-1].squeeze(), y, condition)
 
             # randomly sample negative examples
             # should really do contrastive loss over the batch
@@ -66,8 +66,8 @@ class LSTMTrainer():
 
                 pred, (state_h, state_c) = self.model(torch.unsqueeze(x_neg, 1), (state_h, state_c))
 
-                condition = torch.tensor(0).to('cuda:0')
-                loss_neg = self.loss_fn(state_h[-1][0], y_neg, condition)
+                condition = torch.tensor(-1).to('cuda:0')
+                loss_neg = self.loss_fn(pred[-1].squeeze(), y_neg, condition)
 
                 loss += loss_neg
                 
@@ -79,7 +79,7 @@ class LSTMTrainer():
             #if i % 1000 == 999:
             #    print('Inner loss: ', total_loss / (i*self.neg_samples))
         
-        return total_loss / len(X_train * self.neg_samples)
+        return total_loss / len(X_train)
 
     def dev(self, X_dev):
         total_loss = 0
@@ -97,7 +97,7 @@ class LSTMTrainer():
             pred, (state_h, state_c) = self.model(torch.unsqueeze(x, 1), (state_h, state_c))
 
             condition = torch.tensor(1).to('cuda:0')
-            loss = self.loss_fn(state_h[-1][0], y, condition)
+            loss = self.loss_fn(pred[-1].squeeze(), y, condition)
 
             total_loss += loss.item()
             
@@ -126,7 +126,7 @@ class LSTMTrainer():
             state_c = state_c.to('cuda:0')
             pred, (state_h, state_c) = self.model(torch.unsqueeze(x, 1), (state_h, state_c))
 
-            encoded_query = state_h[-1][0]
+            encoded_query = pred[-1].squeeze()
 
             cos_scores = util.cos_sim(encoded_query, just_corpus_encodings)[0]
             top_results = torch.topk(cos_scores, k=k)

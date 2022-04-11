@@ -26,11 +26,12 @@ Run BM25 baseline: use bm25_baseline.ipynb
 
 Run LSTM: ```python3 neural.py --model lstm --relevance_scores data/relevance_scores.txt --corpus data/encoded_websites.pkl --src_train data/encoded_queries_train.pkl --src_dev data/encoded_queries_dev.pkl --src_test data/encoded_queries_test.pkl --out out/lstm_runs/run.dev.txt```
 
-Evaluate LSTM: ```python3 -m pyserini.eval.trec_eval -m map -m P.1 data/relevance_scores.txt out/lstm_runs/run.val.txt```
+Evaluate LSTM: ```python3 -m pyserini.eval.trec_eval -m map -m P.1 data/relevance_scores.txt out/lstm_runs/run.dev.txt```
 
 
 ## TODO
 - [ ] Update lstm.py and neural.py with proper data loading, batch size
 - [ ] Add more domains to the data set
 - [ ] Try with newer reddit comments
+- [ ] Add data parallel wrappers
 
