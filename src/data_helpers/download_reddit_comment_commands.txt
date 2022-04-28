@@ -1,4 +1,0 @@
-mkdir ../data/
-wget https://files.pushshift.io/reddit/comments/RC_2009-05.bz2
-mv RC_2009-05.bz2 ../data/
-bzip2 -d ../data/RC_2009-05.bz2
