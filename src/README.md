@@ -1,24 +1,30 @@
 ## Setting up data
 
-Follow directions in data_helpers/download_reddit_comment_commands.txt to download Reddit data. Then go through the following:
-
-Assume you are in src directory
-
-Make directory for data: ```mkdir data```
-
-Make directory for websites (needed for Pyserini): ```mkdir data/websites```
-
-Make directory for output (BM25): ```mkdir out/bm25_runs```
-
-Make directory for output (lstm): ```mkdir out/lstm_runs```
-
-Make directory for output (semantic): ```mkdir out/semantic_runs```
-
 Navigate to data helpers directory: ```cd data_helpers```
 
-Set up comment structure: ```python3 format_reddit_comments.py --raw ../data/RC_2009-05 --out ../data/RC_2009-05_formatted.json```
+Follow directions in setup.sh to download Reddit data. Then go through the following:
 
-Scrape URLs: ```python3 scrape_urls.py --formatted ../data/RC_2009-05_formatted.json --out ../data/RC_2009-05_webpages.json```
+Set up comment structure: ```python3 format_reddit_comments.py --out_path ../data_2017-09/ --raw_reddit_data ../data_2017-09/RC_2017-09```
+
+This will create 
+1. ```all_needed_comments.pkl``` A dictionary that maps comment id to raw comment body. Created based on the URLs found and their respective paths back to the root comment.
+2. ```all_urls.pkl``` A dictionary that maps line number (corresponding to a comment, from the original reddit comment json file) to ```{'urls': [all urls in the comment], 'id': id of comment, 'chain': chain of ids from root to comment}```
+3. ```valid_urls.pkl``` Same as ```all_urls.pkl```, but only for URLs that pass the selection criteria. 
+
+Now, we can use the ids in the chains of ```valid_urls.pkl``` and ```all_needed_comments.pkl``` to reconstruct comment threads
+
+Scrape URLs: ```python3 scrape_urls.py --min_length 2 --data_path ../data_2017-09/```
+
+This will create
+1. A collection of scraped webpage text in the ```webpages``` directory (created in setup.sh). Each webpage will have a unique file name and be formatted as a json (matching the expected input for pyserini)
+2. ```url_file_map.pkl``` A dictionary that maps a URL to ```{'filename': name of file in webpages, 'chains': list of comment chains ending with that url, 'status': whether or not the page was successfully scraped, 'split': train, val, or test}```
+
+Finally, we can build our queries and relevance score file: ```python3 build_queries.py --data_path ../data_2017-09/ --out ../data_2017-09/queries/```
+
+This will create
+1. A train/dev/test tsv split of plaintext comment chains in the ```queries``` directory (created in setup.sh). Each comment will be separated by a <C> tag.
+2. ```relevance_scores.txt``` in the ```queries``` directory. Each line maps a query id to a relevant webpage filename. 
+
 
 ## Running baselines
 
@@ -26,18 +32,20 @@ Assume you are in src directory
 
 Run BM25 baseline: use bm25_baseline.ipynb
 
-Run Semantic baseline: ```python3 neural.py --model semantic_baseline --relevance_scores data/relevance_scores.txt --corpus data/encoded_websites.pkl --src_train data/encoded_queries_train.pkl --src_dev data/encoded_queries_dev.pkl --src_test data/encoded_queries_test.pkl --out out/semantic_runs/```
+Run Semantic baseline: TBD
 
-Run LSTM: ```python3 neural.py --model lstm --relevance_scores data/relevance_scores.txt --corpus data/encoded_websites.pkl --src_train data/encoded_queries_train.pkl --src_dev data/encoded_queries_dev.pkl --src_test data/encoded_queries_test.pkl --out out/lstm_runs/```
+Run LSTM: TBD
 
-Evaluate: ```python3 -m pyserini.eval.trec_eval -m map -m P.1 data/relevance_scores.txt <path to run>```
-
+Evaluate: ```python3 -m pyserini.eval.trec_eval -m map -m P.1 <path to relevance scores> <path to run>```
 
 
 ## TODO
+- [x] Add more domains to the data set
+- [x] Try with newer reddit comments
+- [x] Address scrape error to restrict scraped domains to only those selected, not ones present in comments
+
+
 - [ ] Update lstm.py and neural.py with proper data loading, batch size
-- [ ] Add more domains to the data set
-- [ ] Try with newer reddit comments
 - [ ] Add data parallel wrappers
 - [ ] Use model files and place all hyper parameters in there
 - [ ] Semantic search baseline
@@ -46,5 +54,4 @@ Evaluate: ```python3 -m pyserini.eval.trec_eval -m map -m P.1 data/relevance_sco
 - [ ] Make test functions search over faiss instead of loading everything at once (only a problem with scale?)
 - [ ] Use a larger, more powerful encoder (and train it?)
 - [ ] Negative samples with seed for LSTM may not be random, instead do it over batch
-- [ ] Address scrape error to restrict scraped domains to only those selected, not ones present in comments
 

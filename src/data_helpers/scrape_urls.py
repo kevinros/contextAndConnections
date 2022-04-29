@@ -10,7 +10,7 @@ import argparse
 import random
 
 # example run 
-# don't forget to make "webpages_{train,val,text}" directories in the data_path folder
+# don't forget to make "webpages" directories in the data_path folder
 
 # python3 scrape_urls.py --min_length 2 --data_path ../data_2017-09/
 
@@ -83,9 +83,11 @@ if __name__ == '__main__':
         if len(valid_urls[line]['chain']) < MIN_LENGTH:
             continue
         for url in valid_urls[line]['urls']:
-            url_file_map[url] = {'filename': uuid.uuid4().hex}
-
-    pickle.dump(url_file_map, open(DATA_PATH + 'url_file_map.pkl', 'wb'))
+            if url not in url_file_map:
+                url_file_map[url] = {'filename': uuid.uuid4().hex, 'chains': [valid_urls[line]['chain']]}
+            else:
+                # takes care of case where one url has many comment chains
+                url_file_map[url]['chains'].append(valid_urls[line]['chain'])
 
     total_urls = len(url_file_map)
     print('Total webpages to fetch: ', total_urls)
@@ -107,7 +109,7 @@ if __name__ == '__main__':
                 else:
                     split="test"
             out = {'id': url_file_map[url]['filename'], 'contents': text}
-            with open(DATA_PATH + 'webpages_' + split + '/' + url_file_map[url]['filename'] + '.json', 'w') as f:
+            with open(DATA_PATH + 'webpages/' + url_file_map[url]['filename'] + '.json', 'w') as f:
                 json.dump(out, f)
                 url_file_map[url]['status'] = 'success'
                 url_file_map[url]['split'] = split
@@ -115,3 +117,5 @@ if __name__ == '__main__':
         signal.alarm(0) # disable alarm
         if i % 10 == 0: print(i)
         if i > 100: break
+    pickle.dump(url_file_map, open(DATA_PATH + 'url_file_map.pkl', 'wb'))
+

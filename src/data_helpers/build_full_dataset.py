@@ -38,8 +38,7 @@ def process_encode_query(src: list, url: str, remove_last_comment=False) -> list
 if __name__ == '__main__':
     
     parser = argparse.ArgumentParser()
-    parser.add_argument('--formatted', help="path to formatted reddit comments json")
-    parser.add_argument('--webpages', help="path to scraped web pages json")
+    parser.add_argument('--data_path', help="path to outputs of format_reddit_comments and scrape_urls")
 
     parser.add_argument('--bow', help='make bag of words data set')
     parser.add_argument('--encode', help='make encoded data set')
@@ -48,16 +47,19 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = "4,5,6,7"
-
-    # example usage
-    # python3 build_full_dataset.py --formatted ../data/RC_2009-05_formatted.json --webpages ../data/RC_2009-05_webpages.json --bow yes --encode yes --out ../data/
-
-
+    os.environ['CUDA_VISIBLE_DEVICES'] = "2,3"
+    sbert_model = SentenceTransformer('msmarco-distilbert-cos-v5')
     random.seed(100)
 
-    formatted = json.load(open(args.formatted, 'r'))
-    webpages = json.load(open(args.webpages, 'r'))
+
+    valid_urls = pickle.load(open(args.DATA_PATH, 'rb'))
+
+
+    if args.bow:
+        # websites are alreay formatted
+
+
+
 
     encoded_queries = []
     encoded_websites = {}
@@ -66,9 +68,6 @@ if __name__ == '__main__':
 
     relevance_scores = []
 
-    random.shuffle(formatted)
-
-    sbert_model = SentenceTransformer('msmarco-distilbert-cos-v5')
 
     # maps a given url to the webpages index so that the relevance scores can be built
     # using the url of a query

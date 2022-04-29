@@ -105,11 +105,6 @@ if __name__ == '__main__':
                 all_needed_comments[comment_id] = comment['body']
 
 
-    """
-    all_needed_comments: dict of comment_id --> comment body
-    all_urls: dict of line number (from orig data file) --> {urls: arr of extracted urls, id: id of comment, chain: chain of comment id to root}
-    valid_urls: same as all_urls, but only those that match conditions at top of file (domain, type)
-    """
 
     pickle.dump(all_needed_comments, open(DATA_PATH + 'all_needed_comments.pkl', 'wb'))
     pickle.dump(valid_urls, open(DATA_PATH + 'valid_urls.pkl', 'wb'))
