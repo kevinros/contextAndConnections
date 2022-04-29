@@ -2,7 +2,7 @@
 
 Navigate to data helpers directory: ```cd data_helpers```
 
-Follow directions in setup.sh to download Reddit data. Then go through the following:
+Follow directions in setup.txt to download Reddit data. Then go through the following:
 
 Set up comment structure: ```python3 format_reddit_comments.py --out_path ../data_2017-09/ --raw_reddit_data ../data_2017-09/RC_2017-09```
 
@@ -16,13 +16,13 @@ Now, we can use the ids in the chains of ```valid_urls.pkl``` and ```all_needed_
 Scrape URLs: ```python3 scrape_urls.py --min_length 2 --data_path ../data_2017-09/```
 
 This will create
-1. A collection of scraped webpage text in the ```webpages``` directory (created in setup.sh). Each webpage will have a unique file name and be formatted as a json (matching the expected input for pyserini)
+1. A collection of scraped webpage text in the ```webpages``` directory (created in setup.txt). Each webpage will have a unique file name and be formatted as a json (matching the expected input for pyserini)
 2. ```url_file_map.pkl``` A dictionary that maps a URL to ```{'filename': name of file in webpages, 'chains': list of comment chains ending with that url, 'status': whether or not the page was successfully scraped, 'split': train, val, or test}```
 
 Finally, we can build our queries and relevance score file: ```python3 build_queries.py --data_path ../data_2017-09/ --out ../data_2017-09/queries/```
 
 This will create
-1. A train/dev/test tsv split of plaintext comment chains in the ```queries``` directory (created in setup.sh). Each comment will be separated by a <C> tag.
+1. A train/dev/test tsv split of plaintext comment chains in the ```queries``` directory (created in setup.txt). Each comment will be separated by a <C> tag.
 2. ```relevance_scores.txt``` in the ```queries``` directory. Each line maps a query id to a relevant webpage filename. 
 
 
