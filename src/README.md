@@ -1,3 +1,25 @@
+## Data file structure
+You'll need to make all of the directories.
+```
+data_2017-09
+|____encoded_queries
+|   |   queries_{train,val,test}.pkl
+|____encoded_webpages
+|   |   webpages.pkl
+|____pyserini
+|   |   files automatically created when bm25_baseline.ipynb is ran
+|____queries
+|   |   queries_{train,val,test}.tsv
+|____webpages
+|   |   {webpage_id}.json
+|____all_needed_comments.pkl
+|____all_urls.pkl
+|____RC_2017-09
+|____url_file_map.pkl
+|____valid_urls.pkl
+
+
+```
 ## Setting up data
 
 Navigate to data helpers directory: ```cd data_helpers```
