@@ -10,8 +10,6 @@ import argparse
 import random
 
 # example run 
-# don't forget to make "webpages" directories in the data_path folder
-
 # python3 scrape_urls.py --min_length 2 --data_path ../data_2017-09/
 
 
@@ -80,14 +78,16 @@ if __name__ == '__main__':
     # First, map all unique URLs to a file hash
     url_file_map = {}
     for line in valid_urls:
-        if len(valid_urls[line]['chain']) < MIN_LENGTH:
+        if len(valid_urls[line]['chain']) <= MIN_LENGTH:
             continue
         for url in valid_urls[line]['urls']:
             if url not in url_file_map:
                 url_file_map[url] = {'filename': uuid.uuid4().hex, 'chains': [valid_urls[line]['chain']]}
             else:
                 # takes care of case where one url has many comment chains
-                url_file_map[url]['chains'].append(valid_urls[line]['chain'])
+                # just make sure that we don't already have the chain (some duplicates in the comments)
+                if valid_urls[line]['chain'] not in url_file_map[url]['chains']:
+                    url_file_map[url]['chains'].append(valid_urls[line]['chain'])
 
     total_urls = len(url_file_map)
     print('Total webpages to fetch: ', total_urls)
@@ -116,6 +116,6 @@ if __name__ == '__main__':
             
         signal.alarm(0) # disable alarm
         if i % 10 == 0: print(i)
-        if i > 100: break
+        if i > 1000: break
     pickle.dump(url_file_map, open(DATA_PATH + 'url_file_map.pkl', 'wb'))
 

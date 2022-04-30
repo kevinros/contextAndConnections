@@ -58,7 +58,7 @@ if __name__ == '__main__':
     num_layers = 2
     learning_rate = 1e-4
     warm_up_rate = 0.1
-    epochs = 100
+    epochs = 5
 
 
     model = lstm.URLSTM(input_size, hidden_size, num_layers)

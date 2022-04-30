@@ -29,6 +29,8 @@ if __name__ == '__main__':
             'www.slate.com': True, 'www.wired.com': True, 'www.investopedia.com': True, 'www.theonion.com': True, 'www.vox.com': True, 'articles.chicagotribune.com': True}
     # URL endings to ignore
     ignore_type = {'pdf': True, 'jpg': True, 'png':True, 'gif':True}
+    # Authors to ignore
+    ignore_authors = {'HelperBot_': True}
 
     # Data structures to save
     all_urls = {}
@@ -76,7 +78,9 @@ if __name__ == '__main__':
 
             if cleaned_urls:
                 all_urls[i] = {'urls': cleaned_urls}
+
             if cleaned_valid_urls:
+                if comment['author'] in ignore_authors: continue
                 valid_urls[i] = {'urls': cleaned_valid_urls, 'id': comment['id']}
                 if len(valid_urls) % 10000 == 0: print('Valid URLs collected: ', len(valid_urls))
 

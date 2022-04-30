@@ -44,7 +44,7 @@ This will create
 Next, we can build our queries and relevance score file: ```python3 build_queries.py --data_path ../data_2017-09/ --out ../data_2017-09/queries/```
 
 This will create
-1. A train/dev/test tsv split of plaintext comment chains in the ```queries``` directory (created in setup.txt). Each comment will be separated by a <C> tag.
+1. A train/val/test tsv split of plaintext comment chains in the ```queries``` directory (created in setup.txt). Each comment will be separated by a <C> tag.
 2. ```relevance_scores.txt``` in the ```queries``` directory. Each line maps a query id to a relevant webpage filename. 
 
 
@@ -75,6 +75,7 @@ Evaluate: ```python3 -m pyserini.eval.trec_eval -m map -m P.1 <path to relevance
 - [x] Try with newer reddit comments
 - [x] Address scrape error to restrict scraped domains to only those selected, not ones present in comments
 - [x] Semantic search baseline
+- [ ] Rerun comment gathering code to ignore mobile link bots
 - [ ] Proper data loading, batch size
 - [ ] Add data parallel wrappers
 - [ ] Use model files and place all hyper parameters in there

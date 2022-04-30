@@ -17,9 +17,11 @@ def process_query(src: list, url: str, remove_last_comment=False) -> str:
     processed_src = " <C> ".join(src)
     processed_src = re.sub('\[|\]', ' ', processed_src)
     processed_src = re.sub('\( \)', ' ', processed_src)
-    if len(processed_src) > 1024:
-        processed_src = processed_src[-1024:]
-    processed_src = re.sub('\n', '', processed_src)
+    if len(processed_src) > 2048:
+        processed_src = processed_src[-2048:]
+    processed_src = re.sub('\n', ' ', processed_src)
+    processed_src = re.sub('\r', ' ', processed_src)
+
     return processed_src
 
 
