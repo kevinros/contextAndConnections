@@ -30,6 +30,8 @@ class LSTMTrainer():
         self.query_webpage_map = query_webpage_map
 
         self.neg_samples = 1
+        #TODO When need to make this hyperparameter, multiply by batch size
+        self.margin = torch.tensor([10]).float().to('cuda:0')
 
     def train(self, X_train):
         total_loss = 0
@@ -46,30 +48,14 @@ class LSTMTrainer():
 
             pred, (state_h, state_c) = self.model(torch.unsqueeze(x, 1), (state_h, state_c))
 
-            condition = torch.tensor(1).to('cuda:0')
-            loss = self.loss_fn(pred[-1].squeeze(), y, condition)
+            neg_idx = random.randint(0,len(X_train)-1)
 
-            # randomly sample negative examples
-            # should really do contrastive loss over the batch
-            for j in range(self.neg_samples):
-                neg_idx = random.randint(0,len(X_train))
-                if neg_idx == i: continue
+            x_neg_query = X_train[neg_idx]
+            x_neg_query_id = x_neg_query['query_id']
+            y_neg = self.corpus[self.query_webpage_map[x_neg_query_id]]
 
-                x_neg_query = X_train[j]
-                x_neg_query_id = x_neg_query['query_id']
-                x_neg = x_neg_query['encoding']
-                y_neg = self.corpus[self.query_webpage_map[x_neg_query_id]]
 
-                state_h, state_c = self.model.init_state()
-                state_h = state_h.to('cuda:0')
-                state_c = state_c.to('cuda:0')
-
-                pred, (state_h, state_c) = self.model(torch.unsqueeze(x_neg, 1), (state_h, state_c))
-
-                condition = torch.tensor(-1).to('cuda:0')
-                loss_neg = self.loss_fn(pred[-1].squeeze(), y_neg, condition)
-
-                loss += loss_neg
+            loss = self.loss_fn(pred[-1].squeeze(), y, y_neg, self.margin)
                 
             self.optimizer.zero_grad()
             loss.backward()
@@ -81,10 +67,10 @@ class LSTMTrainer():
         
         return total_loss / len(X_train)
 
-    def dev(self, X_dev):
+    def val(self, X_val):
         total_loss = 0
         self.model.eval()
-        for i,query in enumerate(X_dev):
+        for i,query in enumerate(X_val):
 
             query_id = query['query_id']
             x = query['encoding']
@@ -96,12 +82,17 @@ class LSTMTrainer():
 
             pred, (state_h, state_c) = self.model(torch.unsqueeze(x, 1), (state_h, state_c))
 
-            condition = torch.tensor(1).to('cuda:0')
-            loss = self.loss_fn(pred[-1].squeeze(), y, condition)
+            neg_idx = random.randint(0,len(X_val)-1)
+
+            x_neg_query = X_val[neg_idx]
+            x_neg_query_id = x_neg_query['query_id']
+            y_neg = self.corpus[self.query_webpage_map[x_neg_query_id]]
+
+            loss = self.loss_fn(pred[-1].squeeze(), y, y_neg, self.margin)
 
             total_loss += loss.item()
             
-        return total_loss / len(X_dev)
+        return total_loss / len(X_val)
 
     def test(self, X_test, k=10):
         run = []
@@ -128,8 +119,8 @@ class LSTMTrainer():
 
             encoded_query = pred[-1].squeeze()
 
-            cos_scores = util.cos_sim(encoded_query, just_corpus_encodings)[0]
-            top_results = torch.topk(cos_scores, k=k)
+            scores = util.dot_score(encoded_query, just_corpus_encodings)[0]
+            top_results = torch.topk(scores, k=k)
             for j, (score, idx) in enumerate(zip(top_results[0], top_results[1])):
                 # 0 Q0 0 1 193.457108 Anserini
                 run.append(' '.join([str(query_id), 'Q0', str(webpage_id_map[idx.item()]), str(j), str(score.item()), 'LSTM']))
