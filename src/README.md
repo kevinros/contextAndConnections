@@ -53,11 +53,9 @@ Evaluate: ```python3 -m pyserini.eval.trec_eval -m map -m P.1 <path to relevance
 - [x] Try with newer reddit comments
 - [x] Address scrape error to restrict scraped domains to only those selected, not ones present in comments
 - [x] Semantic search baseline
-- [ ] Update lstm.py and neural.py with proper data loading, batch size
+- [ ] Proper data loading, batch size
 - [ ] Add data parallel wrappers
 - [ ] Use model files and place all hyper parameters in there
-- [ ] Transformer performance on dev
-- [ ] Combine LSTM test method with semantic search (lots of reused code)
 - [ ] Make test functions search over faiss instead of loading everything at once (only a problem with scale?)
 - [ ] Use a larger, more powerful encoder (and train it?)
 - [ ] Do negative samples over batch, or in two stage retrieval

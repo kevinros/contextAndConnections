@@ -7,7 +7,6 @@ import torch
 # python3 semantic_baseline.py --corpus data_2017-09/encoded_webpages/webpages.pkl --queries data_2017-09/encoded_queries/queries_train.pkl --out out/semantic_runs/
 
 def semantic_baseline(corpus, queries, k=10):
-    # TODO: combine with LSTM test method
     run = []
     # so that we can do cosine scores and recover the actual id of the webpage
     just_corpus_encodings = [torch.unsqueeze(corpus[x],dim=0) for x in corpus]
