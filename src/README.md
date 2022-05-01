@@ -3,7 +3,7 @@ An analysis of hyperlink mentions on the Internet.
 
 ## Data file structure
 You'll need to make the directories (in **bold**)
-```
+
 data_2017-09
 |____**encoded_queries**
 |   |   queries_{train,val,test}.pkl
@@ -20,7 +20,7 @@ data_2017-09
 |____RC_2017-09
 |____url_file_map.pkl
 |____valid_urls.pkl
-```
+
 ## Setting up data
 
 Navigate to data helpers directory: ```cd data_helpers```
