@@ -2,8 +2,8 @@
 An analysis of hyperlink mentions on the Internet.
 
 ## Data file structure
-You'll need to make the directories (in **bold**)
-
+You'll need to make the directories (starred)
+```
 data_2017-09
 |____**encoded_queries**
 |   |   queries_{train,val,test}.pkl
@@ -20,7 +20,7 @@ data_2017-09
 |____RC_2017-09
 |____url_file_map.pkl
 |____valid_urls.pkl
-
+```
 ## Setting up data
 
 Navigate to data helpers directory: ```cd data_helpers```
@@ -76,6 +76,7 @@ Evaluate: ```python3 -m pyserini.eval.trec_eval -m map -m P.1 <path to relevance
 - [x] Try with newer reddit comments
 - [x] Address scrape error to restrict scraped domains to only those selected, not ones present in comments
 - [x] Semantic search baseline
+- [ ] Unit testing
 - [ ] Rerun comment gathering code to ignore mobile link bots
 - [ ] Proper data loading, batch size
 - [ ] Add data parallel wrappers
