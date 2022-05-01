@@ -1,24 +1,25 @@
+# Context and Connections
+An analysis of hyperlink mentions on the Internet.
+
 ## Data file structure
-You'll need to make all of the directories.
+You'll need to make the directories (in **bold**)
 ```
 data_2017-09
-|____encoded_queries
+|____**encoded_queries**
 |   |   queries_{train,val,test}.pkl
-|____encoded_webpages
+|____**encoded_webpages**
 |   |   webpages.pkl
-|____pyserini
+|____**pyserini**
 |   |   files automatically created when bm25_baseline.ipynb is ran
-|____queries
+|____**queries**
 |   |   queries_{train,val,test}.tsv
-|____webpages
+|____**webpages**
 |   |   {webpage_id}.json
 |____all_needed_comments.pkl
 |____all_urls.pkl
 |____RC_2017-09
 |____url_file_map.pkl
 |____valid_urls.pkl
-
-
 ```
 ## Setting up data
 
