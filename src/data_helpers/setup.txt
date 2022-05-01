@@ -2,7 +2,7 @@
 mkdir ../data_2017-09/
 
 
-# for downloading reddit September 2017 data set
+# for downloading reddit September 2017 comment data set
 wget https://files.pushshift.io/reddit/comments/RC_2017-09.bz2
 mv RC_2017-09.bz2 ../data_2017-09/
 bzip2 -d ../data_2017-09/RC_2017-09.bz2
@@ -11,3 +11,9 @@ bzip2 -d ../data_2017-09/RC_2017-09.bz2
 mkdir ../data_2017-09/webpages
 mkdir ../data_2017-09/queries
 mkdir ../data_2017-09/pyserini
+
+# for downloading the reddit September 2017 submission data set
+wget https://files.pushshift.io/reddit/submissions/RS_2017-09.zst
+mv RS_2017-09.zst  ../data_2017-09/
+unzstd --memory=2048MB ../data_2017-09/RS_2017-09.zst 
+rm ../data_2017-09/RS_2017-09.zst 

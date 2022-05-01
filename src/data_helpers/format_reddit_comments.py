@@ -8,6 +8,43 @@ import argparse
 # example run
 # python3 format_reddit_comments.py --out_path ../data_2017-09/ --raw_reddit_data ../data_2017-09/RC_2017-09
 
+def extract_urls(comment_body, ignore_type={}, ignore_domains={}, valid_domains={}):
+    cleaned_urls = []
+    cleaned_valid_urls = []
+    for url in re.findall(r'(https?://\S+-\n)?(?(1)([\S]*)|(https?://\S+))', comment_body):
+
+        # heuristics for parsing url
+        url = "".join(url)
+        url = re.sub('\)', '', url)
+        url = re.sub('\]', '', url)
+        url = re.sub('\n', '', url)
+        url = re.sub(',', '', url)
+        url = re.sub(' ', '', url)
+        if url[-1] == ".":
+            url = url[:-1]
+
+        try:
+            domain = urlparse(url).netloc
+        except:
+            continue
+
+        # merge wikipedia and wikipedia.m domains
+        if domain == "en.m.wikipedia.org":
+            url = re.sub('\.m', '', url)
+
+        cleaned_urls.append(url)
+
+        if url[-3:] in ignore_type: continue
+
+        if domain in ignore_domains: continue
+
+        
+        if valid_domains != {} and url not in valid_domains: continue
+
+        
+        cleaned_valid_urls.append(url)
+    return cleaned_urls, cleaned_valid_urls
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
@@ -45,36 +82,7 @@ if __name__ == '__main__':
 
             id_parent_mapping[comment['id']] = comment['parent_id'][3:]
 
-            cleaned_urls = []
-            cleaned_valid_urls = []
-            for url in re.findall(r'(https?://\S+-\n)?(?(1)([\S]*)|(https?://\S+))', comment['body']):
-
-                # heuristics for parsing url
-                url = "".join(url)
-                url = re.sub('\)', '', url)
-                url = re.sub('\]', '', url)
-                url = re.sub('\n', '', url)
-                url = re.sub(',', '', url)
-                url = re.sub(' ', '', url)
-                if url[-1] == ".":
-                    url = url[:-1]
-
-                try:
-                    domain = urlparse(url).netloc
-                except:
-                    continue
-
-                # merge wikipedia and wikipedia.m domains
-                if domain == "en.m.wikipedia.org":
-                    url = re.sub('\.m', '', url)
-
-                cleaned_urls.append(url)
-
-                if url[-3:] in ignore_type: continue
-                
-                if domain not in valid_domains: continue
-                
-                cleaned_valid_urls.append(url)
+            cleaned_urls , cleaned_valid_urls = extract_urls(comment['body'], ignore_type=ignore_type, valid_domains=valid_domains)
 
             if cleaned_urls:
                 all_urls[i] = {'urls': cleaned_urls}
