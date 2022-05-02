@@ -79,12 +79,13 @@ Evaluate: ```python3 -m pyserini.eval.trec_eval -m map -m P.1 <path to relevance
 - [x] Try with newer reddit comments
 - [x] Address scrape error to restrict scraped domains to only those selected, not ones present in comments
 - [x] Semantic search baseline
-- [ ] Unit testing
-- [ ] Rerun comment gathering code to ignore mobile link bots
-- [ ] Proper data loading, batch size
+- [x] Rerun comment gathering code to ignore mobile link bots
+- [ ] Add transformer code to src (maybe can leverage sbert with no pretrained model?)
+- [ ] Manually inspect some scraped websites and processed queries --> is the text clean enough??
+- [ ] Do a full scrape, then get scores for all of the models
+- [ ] Make test functions search over faiss instead of loading everything at once (only a problem with scale?)
+- [ ] Use teacher to enforce negative samples with the margin (see [https://arxiv.org/pdf/2010.02666.pdf](paper), [https://github.com/UKPLab/sentence-transformers/blob/40af04ed70e16408f466faaa5243bee6f476b96e/examples/training/ms_marco/train_bi-encoder_mnrl.py#L149](code))
+- [ ] Proper data loading, batch size for LSTM
 - [ ] Add data parallel wrappers
 - [ ] Use model files and place all hyper parameters in there
-- [ ] Make test functions search over faiss instead of loading everything at once (only a problem with scale?)
-- [ ] Use a larger, more powerful encoder (and train it?)
-- [ ] Do negative samples over batch, or in two stage retrieval
 
