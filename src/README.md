@@ -58,7 +58,7 @@ To pre-encode the queries and webpages for the semantic baseline and the preenco
 ```python3 encode_dataset.py --webpages_path ../data_2017-09/webpages/ --out ../data_2017-09/encoded_webpages/webpages.pkl```
 
 
-## Running baselines
+## Training and evaluating the models
 
 Assume you are in src directory
 
@@ -68,7 +68,10 @@ Run Semantic baseline: ```python3 semantic_baseline.py --corpus data_2017-09/enc
 
 Run LSTM preencoded: ```python3 lstm_preencoded.py --relevance_scores data_2017-09/queries/relevance_scores.txt --corpus data_2017-09/encoded_webpages/webpages.pkl --queries_train data_2017-09/encoded_queries/queries_train.pkl --queries_val data_2017-09/encoded_queries/queries_val.pkl --out out/lstm_preencoded_runs/```
 
+Run Semantic finetune: ```python3 semantic_finetune.py --corpus data_2017-09/webpages/ --queries data_2017-09/queries/```
+
 Evaluate: ```python3 -m pyserini.eval.trec_eval -m map -m P.1 <path to relevance scores> <path to run>```
+
 
 
 ## TODO
