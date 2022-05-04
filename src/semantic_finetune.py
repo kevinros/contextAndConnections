@@ -7,9 +7,13 @@ import os
 from torch.utils.data import Dataset
 import random
 import argparse
+import torch
+from typing import List
+from sentence_transformers.evaluation import SentenceEvaluator, SimilarityFunction
 
 # example usage
 # python3 semantic_finetune.py --corpus data_2017-09/webpages/ --queries data_2017-09/queries/
+
 
 def load_rel_scores(path):
     relevance_scores = open(path, 'r')
@@ -25,13 +29,14 @@ def load_queries(path, relevance_scores, num_neg=5, type='train'):
     rel_score_keys = list(relevance_scores.keys())
     num_options = len(rel_score_keys)-1
     with open(path, 'r') as f:
-        for line in f:
+        for i,line in enumerate(f):
             split_line = line.split('\t')
             query_id = split_line[0]
             query = " ".join(split_line[1:])
 
             if type == "val" or type == "test":
                 queries[query_id] = query
+                if i > 500: break # TODO: remove this once the training process is fast enough to handle the full val set
                 continue
 
             # The original implementation chooses "hard samples". We could probably do something like that, i.e., using the BM25 run
@@ -130,6 +135,8 @@ if __name__ == '__main__':
         pooling_model = models.Pooling(word_embedding_model.get_word_embedding_dimension(), args.pooling)
         model = SentenceTransformer(modules=[word_embedding_model, pooling_model])
 
+    #model = torch.nn.DataParallel(model)
+
 
     model_save_path = 'out/semantic_finetune_runs/train_bi-encoder-mnrl-{}-margin_{:.1f}-{}'.format(model_name.replace("/", "-"), ce_score_margin, datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
 
@@ -142,6 +149,9 @@ if __name__ == '__main__':
 
     print('Queries loaded')
 
+    print(len(train_queries), ' training queries')
+    print(len(val_queries), ' validation queries')
+
 
     corpus = load_webpages(corpus_path)
 
@@ -151,10 +161,19 @@ if __name__ == '__main__':
     train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=train_batch_size)
     train_loss = losses.MultipleNegativesRankingLoss(model=model)
 
+    val_corpus = {}
+    for query in val_queries:
+        query_doc = relevance_scores[query]
+        val_corpus[query_doc] = corpus[query_doc]
 
+    evaluator = evaluation.InformationRetrievalEvaluator(val_queries, val_corpus, relevance_scores, corpus_chunk_size=100)
+    # going to be super slow because it needs to encode the ENTIRE corpus
+    # for now, just compute embedding similarity
+    #val_query_src = [val_queries[x] for x in val_queries]
+    #val_query_tgt = [corpus[relevance_scores[x]] for x in val_queries]
+    #evaluator = evaluation.EmbeddingSimilarityEvaluator(val_query_src, val_query_tgt)
 
-    evaluator = evaluation.InformationRetrievalEvaluator(val_queries, corpus, relevance_scores, corpus_chunk_size=100)
-
+    
 
     print('Beginning to train')
     model.fit(train_objectives=[(train_dataloader, train_loss)],
@@ -166,11 +185,5 @@ if __name__ == '__main__':
           optimizer_params = {'lr': args.lr},
           output_path=model_save_path,
           )
-
-
-
-    #with open(args.out + 'run.train.txt', 'w') as f:
-    #    for line in run:
-    #        f.write(line + '\n')
     
 
