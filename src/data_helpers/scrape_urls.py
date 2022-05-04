@@ -12,7 +12,6 @@ import random
 # example run 
 # python3 scrape_urls.py --min_length 2 --data_path ../data_2017-09/
 
-
 class TimeoutException(Exception):
         pass
 
@@ -29,6 +28,15 @@ def scrape(url: str) -> str:
         return ""
 
     soup = BeautifulSoup(html, features="html.parser")
+
+    # paragraphs = soup.find_all("p")
+    # alphabet_checker = re.compile('[a-zA-z]')
+
+    # for paragraph in paragraphs:
+    #     paragraph_text = paragraph.get_text()
+    #     if alphabet_checker.findall(paragraph_text):
+    #         if 'wikipedia.org' in url:
+    #             return paragraph_text
 
     # kill all script and style elements
     for script in soup(["script", "style"]):
@@ -59,8 +67,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-
-
     MIN_LENGTH = int(args.min_length)
     DATA_PATH = args.data_path
 
@@ -71,9 +77,7 @@ if __name__ == '__main__':
     # then split not train into val and test
     VAL_TEST_SPLIT = 0.5
 
-
     valid_urls = pickle.load(open(DATA_PATH + 'valid_urls.pkl', 'rb'))
-
 
     # First, map all unique URLs to a file hash
     url_file_map = {}
