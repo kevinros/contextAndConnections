@@ -36,7 +36,7 @@ def load_queries(path, relevance_scores, num_neg=5, type='train'):
 
             if type == "val" or type == "test":
                 queries[query_id] = query
-                if i > 500: break # TODO: remove this once the training process is fast enough to handle the full val set
+                if i > 1000: break # TODO: remove this once the training process is fast enough to handle the full val set
                 continue
 
             # The original implementation chooses "hard samples". We could probably do something like that, i.e., using the BM25 run
@@ -179,7 +179,7 @@ if __name__ == '__main__':
     model.fit(train_objectives=[(train_dataloader, train_loss)],
           epochs=num_epochs,
           evaluator=evaluator,
-          evaluation_steps=100,
+          evaluation_steps=500,
           warmup_steps=args.warmup_steps,
           use_amp=True,
           optimizer_params = {'lr': args.lr},
