@@ -1,4 +1,5 @@
 import argparse
+from multiprocessing import process
 import re
 import pickle
 
@@ -21,6 +22,7 @@ def process_query(src: list, url: str, remove_last_comment=False) -> str:
         processed_src = processed_src[-2048:]
     processed_src = re.sub('\n', ' ', processed_src)
     processed_src = re.sub('\r', ' ', processed_src)
+    processed_src = ' '.join(processed_src.split())
 
     return processed_src
 

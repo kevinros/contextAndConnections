@@ -135,10 +135,17 @@ if __name__ == '__main__':
 
 
     relevance_scores = load_rel_scores(query_path + 'relevance_scores.txt')
+    print('Relevance scores loaded')
 
     train_queries = load_queries(query_path + 'queries_train.tsv', relevance_scores, num_negs_per_system)
     val_queries = load_queries(query_path + 'queries_val.tsv', relevance_scores, type="val")
+
+    print('Queries loaded')
+
+
     corpus = load_webpages(corpus_path)
+
+    print('Corpus loaded')
 
     train_dataset = WebpageDataset(train_queries, corpus=corpus)
     train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=train_batch_size)
@@ -149,6 +156,7 @@ if __name__ == '__main__':
     evaluator = evaluation.InformationRetrievalEvaluator(val_queries, corpus, relevance_scores, corpus_chunk_size=100)
 
 
+    print('Beginning to train')
     model.fit(train_objectives=[(train_dataloader, train_loss)],
           epochs=num_epochs,
           evaluator=evaluator,

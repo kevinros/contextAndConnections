@@ -91,15 +91,18 @@ if __name__ == '__main__':
 
     total_urls = len(url_file_map)
     print('Total webpages to fetch: ', total_urls)
+    success = 0
     for i,url in enumerate(url_file_map):
         url_file_map[url]['status'] = 'failure'
-
-        signal.signal(signal.SIGALRM, handler)
-        signal.alarm(TIMEOUT)
+       
         try:
+            signal.signal(signal.SIGALRM, handler)
+            signal.alarm(TIMEOUT)
             text = scrape(url)
+            signal.alarm(0) # disable alarm
         except:
             continue
+        
         if len(text.strip()) > 100:
             if random.uniform(0,1) < TRAIN_SIZE:
                 split="train"
@@ -113,9 +116,10 @@ if __name__ == '__main__':
                 json.dump(out, f)
                 url_file_map[url]['status'] = 'success'
                 url_file_map[url]['split'] = split
-            
-        signal.alarm(0) # disable alarm
-        if i % 10 == 0: print(i)
-        if i > 1000: break
+                success += 1
+        if i % 100 == 0: 
+            print('Total URLs', i)
+            print('Success', success)
+
     pickle.dump(url_file_map, open(DATA_PATH + 'url_file_map.pkl', 'wb'))
 
