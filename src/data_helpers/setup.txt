@@ -17,3 +17,7 @@ wget https://files.pushshift.io/reddit/submissions/RS_2017-09.zst
 mv RS_2017-09.zst  ../data_2017-09/
 unzstd --memory=2048MB ../data_2017-09/RS_2017-09.zst 
 rm ../data_2017-09/RS_2017-09.zst 
+
+# compression commands
+tar -cvzf queries.tar.gz queries/
+tar -cvzf webpages.tar.gz webpages/

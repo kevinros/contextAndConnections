@@ -16,11 +16,11 @@ from sentence_transformers.evaluation import SentenceEvaluator, SimilarityFuncti
 
 
 def load_rel_scores(path):
-    relevance_scores = open(path, 'r')
     query_webpage_map = {}
-    for line in relevance_scores:
-        split_line = line.split()
-        query_webpage_map[split_line[0]] = split_line[2]
+    with open(path, 'r') as relevance_scores:
+        for line in relevance_scores:
+            split_line = line.split()
+            query_webpage_map[split_line[0]] = split_line[2]
     return query_webpage_map
 
 

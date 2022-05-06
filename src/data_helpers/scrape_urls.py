@@ -10,7 +10,7 @@ import argparse
 import random
 
 # example run 
-# python3 scrape_urls.py --min_length 2 --data_path ../data_2017-09/
+# python3 scrape_urls.py --min_length 2 --data_path ../data_2017-09/ --url_file_map ../data_2017-09/url_file_map.pkl
 
 class TimeoutException(Exception):
         pass
@@ -63,6 +63,8 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--min_length', help="minimum number of comments in chain to consider the URL")
+    parser.add_argument('--url_file_map', help="path to previous scrape")
+
     parser.add_argument('--data_path', help="path to output of format_reddit_comments.py")
 
     args = parser.parse_args()
@@ -80,9 +82,13 @@ if __name__ == '__main__':
     valid_urls = pickle.load(open(DATA_PATH + 'valid_urls.pkl', 'rb'))
 
     # First, map all unique URLs to a file hash
-    url_file_map = {}
+    if args.url_file_map:
+        print('Using existing url file map: ', args.url_file_map)
+        url_file_map = pickle.load(open(args.url_file_map, 'rb'))
+    else:
+        url_file_map = {}
     for line in valid_urls:
-        if len(valid_urls[line]['chain']) <= MIN_LENGTH:
+        if len(valid_urls[line]['chain']) < MIN_LENGTH:
             continue
         for url in valid_urls[line]['urls']:
             if url not in url_file_map:
@@ -97,6 +103,15 @@ if __name__ == '__main__':
     print('Total webpages to fetch: ', total_urls)
     success = 0
     for i,url in enumerate(url_file_map):
+
+        if i % 100 == 0: 
+            print('Total URLs', i, ' out of ', total_urls)
+            print('Success', success)
+
+        # have already (tried to) scraped it
+        if 'status' in url_file_map[url]: 
+            continue
+
         url_file_map[url]['status'] = 'failure'
        
         try:
@@ -121,9 +136,6 @@ if __name__ == '__main__':
                 url_file_map[url]['status'] = 'success'
                 url_file_map[url]['split'] = split
                 success += 1
-        if i % 100 == 0: 
-            print('Total URLs', i)
-            print('Success', success)
 
     pickle.dump(url_file_map, open(DATA_PATH + 'url_file_map.pkl', 'wb'))
 
