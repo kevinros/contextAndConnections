@@ -4,16 +4,20 @@ import re
 import pickle
 
 # example run 
-# python3 build_queries.py --data_path ../data_2017-09/ --out ../data_2017-09/queries/
+# python3 build_queries.py --data_path ../data_2017-09/ --out ../data_2017-09/queries/ --mode all 
+# python3 build_queries.py --data_path ../data_2017-09/ --out ../data_2017-09/queries_onlylast/ --mode only_last 
 
-def process_query(src: list, url: str, remove_last_comment=False) -> str:
+def process_query(src: list, url: str, mode='all') -> str:
     '''
     Processing query code
     '''
-    if remove_last_comment:
+    if mode == 'remove_last':
         src = src[:-1]
     else:
         src[-1] = re.sub(re.escape(url), ' ', src[-1])
+
+    if mode == "only_last":
+        src = [src[-1]]
 
     processed_src = " <C> ".join(src)
     processed_src = re.sub('\[|\]', ' ', processed_src)
@@ -24,6 +28,8 @@ def process_query(src: list, url: str, remove_last_comment=False) -> str:
     processed_src = re.sub('\n', ' ', processed_src)
     processed_src = re.sub('\r', ' ', processed_src)
     processed_src = ' '.join(processed_src.split())
+    if processed_src == "":
+        processed_src = "NULL"
 
     return processed_src
 
@@ -31,7 +37,7 @@ def process_query(src: list, url: str, remove_last_comment=False) -> str:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_path', help="path to outputs of format_reddit_comments and scrape_urls")
-
+    parser.add_argument('--mode', help="[all, remove_last, only_last]")
     parser.add_argument('--out_path', help='dir path to save query sets and relevance scores')
 
     args = parser.parse_args()
@@ -55,7 +61,7 @@ if __name__ == '__main__':
 
         for chain in url_file_map[url]['chains']:
             comments = [all_needed_comments[id] for id in chain]
-            processed_comments = process_query(comments, url)
+            processed_comments = process_query(comments, url, args.mode)
 
             if url_file_map[url]['split'] == 'train':
                 train_queries.append(str(query_idx) + '\t' + processed_comments)
