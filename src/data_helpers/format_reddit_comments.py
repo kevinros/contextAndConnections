@@ -61,7 +61,7 @@ if __name__ == '__main__':
     valid_domains = {'en.wikipedia.org': True, 'en.m.wikipedia.org': True, 'www.washingtonpost.com': True, 'www.theguardian.com': True, 'www.independent.co.uk': True,
             'www.theatlantic.com': True, 'www.bbc.com': True, 'www.nbcnews.com': True, 'www.usatoday.com': True, 'www.cnn.com': True, 'insider.foxnews.com': True,
             'www.npr.org': True, 'www.espn.com': True, 'www.politico.com': True, 'www.bbc.co.uk': True, 'www.telegraph.co.uk': True, 'www.businessinsider.com': True,
-            'www.bloomberg.com': True, 'www.bbc.co.uk': True, 'www.forbes.com': True, 'abcnews.go.com': True, 'www.huffingtonpost.com': True, 'www.latimes.com': True,
+            'www.bbc.co.uk': True, 'www.forbes.com': True, 'abcnews.go.com': True, 'www.huffingtonpost.com': True, 'www.latimes.com': True,
             'www.pbs.org': True, 'www.thesun.co.uk': True, 'www.chicagotribune.com': True, 'www.dailymail.co.uk': True, 'www.cnbc.com': True, 'www.foxnews.com': True,
             'www.slate.com': True, 'www.wired.com': True, 'www.investopedia.com': True, 'www.theonion.com': True, 'www.vox.com': True, 'articles.chicagotribune.com': True}
     # URL endings to ignore

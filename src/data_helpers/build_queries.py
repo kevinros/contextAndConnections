@@ -22,9 +22,9 @@ def process_query(src: list, url: str, mode='all') -> str:
     processed_src = " <C> ".join(src)
     processed_src = re.sub('\[|\]', ' ', processed_src)
     processed_src = re.sub('\( \)', ' ', processed_src)
-    # for pyserini
-    if len(processed_src) > 3000:
-        processed_src = processed_src[-3000:]
+    # for pyserini lucene maxclasue=1024
+    if len(processed_src.split(' ')) > 500 and mode!='only_last':
+        processed_src = " ".join(processed_src.split(' ')[-500:])
     processed_src = re.sub('\n', ' ', processed_src)
     processed_src = re.sub('\r', ' ', processed_src)
     processed_src = ' '.join(processed_src.split())
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     relevance_scores = []
 
     for url in url_file_map:
-        if 'status' not in url_file_map[url] or url_file_map[url]['status'] == "failure": continue
+        if 'status' not in url_file_map[url] or url_file_map[url]['status'] != "success": continue
 
 
         for chain in url_file_map[url]['chains']:
