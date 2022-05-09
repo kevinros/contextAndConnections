@@ -10,24 +10,21 @@ import argparse
 import torch
 from typing import List
 from sentence_transformers.evaluation import SentenceEvaluator, SimilarityFunction
+from eval import eval
 
 # example usage
 # python3 semantic_finetune.py --corpus data_2017-09/webpages/ --queries data_2017-09/queries/
 
 
-def load_rel_scores(path):
-    query_webpage_map = {}
-    with open(path, 'r') as relevance_scores:
-        for line in relevance_scores:
-            split_line = line.split()
-            query_webpage_map[split_line[0]] = split_line[2]
-    return query_webpage_map
 
-
-def load_queries(path, relevance_scores, num_neg=5, type='train'):
+def load_queries(path, relevance_scores, num_neg=2, type='train', neg_sample_run_path='out/bm25_runs/run.train_8_0.99.txt'):
     queries = {}
+    neg_sample_run = eval.load_run(neg_sample_run_path)
+    
     rel_score_keys = list(relevance_scores.keys())
     num_options = len(rel_score_keys)-1
+
+
     with open(path, 'r') as f:
         for i,line in enumerate(f):
             split_line = line.split('\t')
@@ -39,13 +36,27 @@ def load_queries(path, relevance_scores, num_neg=5, type='train'):
                 if i > 1000: break # TODO: remove this once the training process is fast enough to handle the full val set
                 continue
 
-            # The original implementation chooses "hard samples". We could probably do something like that, i.e., using the BM25 run
-            # For now, it's just random
             neg_pids = []
-            for _ in range(0, num_neg):
-                rand_idx = random.randint(0,num_options)
-                neg_pids.append(relevance_scores[rel_score_keys[rand_idx]])
+
+            # there is an unhandled case where if the query is empty, then it doesn't show up in bm25
+            # unclear how to handle, so for now, if that happens, we'll just randomly sample
+            if query_id not in neg_sample_run:
+                print(query_id, query)
+                
+                for _ in range(0, num_neg):
+                    rand_idx = random.randint(0,num_options)
+                    neg_pids.append(relevance_scores[rel_score_keys[rand_idx]])
+
+            else:
+                # use another run, automatically takes the highest not equal to ground truth
+                # note max num_neg is 10 currently
+                for i,returned_doc_id in enumerate(neg_sample_run[query_id]):
+                    if returned_doc_id == relevance_scores[query_id]: continue
+                    if len(neg_pids) == num_neg: break
+                    neg_pids.append(returned_doc_id)
+
             queries[query_id] = {'qid': query_id, 'query': query, 'pos': [relevance_scores[query_id]], 'neg': neg_pids}
+    exit()
     return queries
 
 def load_webpages(path):
@@ -91,18 +102,16 @@ if __name__ == '__main__':
     random.seed(100)
     
     parser = argparse.ArgumentParser()
-    parser.add_argument("--train_batch_size", default=5, type=int)
+    parser.add_argument("--train_batch_size", default=20, type=int)
     parser.add_argument("--max_seq_length", default=512, type=int)
     parser.add_argument("--model_name", default="msmarco-distilbert-dot-v5")
-    parser.add_argument("--max_passages", default=0, type=int)
     parser.add_argument("--epochs", default=5, type=int)
     parser.add_argument("--pooling", default="mean")
-    parser.add_argument("--warmup_steps", default=1000, type=int)
+    parser.add_argument("--warmup_steps", default=300, type=int)
     parser.add_argument("--lr", default=2e-5, type=float)
     parser.add_argument("--num_negs_per_system", default=1, type=int)
     parser.add_argument("--use_pre_trained_model", default=True, action="store_true")
     parser.add_argument("--use_all_queries", default=False, action="store_true")
-    parser.add_argument("--ce_score_margin", default=3.0, type=float)
 
     parser.add_argument("--corpus", required=True)
     parser.add_argument("--queries", required=True)
@@ -111,17 +120,14 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = "4,5,6,7"
+    os.environ['CUDA_VISIBLE_DEVICES'] = "1"
 
 
     model_name = args.model_name
     train_batch_size = args.train_batch_size         
     max_seq_length = args.max_seq_length            
-    ce_score_margin = args.ce_score_margin            
     num_negs_per_system = args.num_negs_per_system         
     num_epochs = args.epochs
-
-
     query_path = args.queries
     corpus_path = args.corpus
 
@@ -138,10 +144,10 @@ if __name__ == '__main__':
     #model = torch.nn.DataParallel(model)
 
 
-    model_save_path = 'out/semantic_finetune_runs/train_bi-encoder-mnrl-{}-margin_{:.1f}-{}'.format(model_name.replace("/", "-"), ce_score_margin, datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+    model_save_path = 'out/semantic_finetune_runs/train_bi-encoder-mnrl-{}-{}'.format(model_name.replace("/", "-"), datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
 
 
-    relevance_scores = load_rel_scores(query_path + 'relevance_scores.txt')
+    relevance_scores = eval.load_rel_scores(query_path + 'relevance_scores.txt')
     print('Relevance scores loaded')
 
     train_queries = load_queries(query_path + 'queries_train.tsv', relevance_scores, num_negs_per_system)
@@ -184,6 +190,6 @@ if __name__ == '__main__':
           use_amp=True,
           optimizer_params = {'lr': args.lr},
           output_path=model_save_path,
-          )
+    )
     
 
