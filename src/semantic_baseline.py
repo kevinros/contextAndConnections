@@ -5,7 +5,9 @@ import torch
 import hnswlib
 
 # example usage
-# python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_baseline.bin --index_map data_2017-09/encoded_webpages/int_id_map_webpages_baseline.pkl --queries data_2017-09/encoded_queries/queries_val.pkl --out out/semantic_runs/run.val.txt
+# python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_baseline.bin --index_map data_2017-09/encoded_webpages/int_id_map_webpages_baseline.pkl --queries data_2017-09/queries/queries_val.pkl --out out/semantic_runs/run.val_full.txt
+# python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_baseline.bin --index_map data_2017-09/encoded_webpages/int_id_map_webpages_baseline.pkl --queries data_2017-09/queries_onlylast/queries_val.pkl --out out/semantic_runs/run.val_onlylast.txt
+# python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_baseline.bin --index_map data_2017-09/encoded_webpages/int_id_map_webpages_baseline.pkl --queries data_2017-09/queries_removelast/queries_val.pkl --out out/semantic_runs/run.val_removelast.txt
 
 def semantic_baseline(index, int_id_map, queries, k=10):
     run = []
@@ -14,8 +16,7 @@ def semantic_baseline(index, int_id_map, queries, k=10):
 
         query_id = query['query_id']
 
-        # get the last comment (with the missing URL)
-        x = query['encoding'][-1].cpu()
+        x = query['encoding'].cpu()
 
         labels, distances = index.knn_query(x, k)
 

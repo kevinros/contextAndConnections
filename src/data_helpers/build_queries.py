@@ -5,7 +5,8 @@ import pickle
 
 # example run 
 # python3 build_queries.py --data_path ../data_2017-09/ --out ../data_2017-09/queries/ --mode all 
-# python3 build_queries.py --data_path ../data_2017-09/ --out ../data_2017-09/queries_onlylast/ --mode only_last 
+# python3 build_queries.py --data_path ../data_2017-09/ --out ../data_2017-09/queries_onlylast/ --mode only_last
+# python3 build_queries.py --data_path ../data_2017-09/ --out ../data_2017-09/queries_removelast/ --mode remove_last 
 
 def process_query(src: list, url: str, mode='all') -> str:
     '''
@@ -23,7 +24,7 @@ def process_query(src: list, url: str, mode='all') -> str:
     processed_src = re.sub('\[|\]', ' ', processed_src)
     processed_src = re.sub('\( \)', ' ', processed_src)
     # for pyserini lucene maxclasue=1024
-    if len(processed_src.split(' ')) > 500 and mode!='only_last':
+    if len(processed_src.split(' ')) > 500 and mode !='only_last':
         processed_src = " ".join(processed_src.split(' ')[-500:])
     processed_src = re.sub('\n', ' ', processed_src)
     processed_src = re.sub('\r', ' ', processed_src)

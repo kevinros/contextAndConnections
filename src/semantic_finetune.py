@@ -17,7 +17,7 @@ from eval import eval
 
 
 
-def load_queries(path, relevance_scores, num_neg=2, type='train', neg_sample_run_path='out/bm25_runs/run.train_8_0.99.txt'):
+def load_queries(path, relevance_scores, num_neg=1, type='train', neg_sample_run_path='out/bm25_runs/run.train_8_0.99.txt'):
     queries = {}
     neg_sample_run = eval.load_run(neg_sample_run_path)
     
@@ -33,16 +33,16 @@ def load_queries(path, relevance_scores, num_neg=2, type='train', neg_sample_run
 
             if type == "val" or type == "test":
                 queries[query_id] = query
-                if i > 1000: break # TODO: remove this once the training process is fast enough to handle the full val set
+                if i > 2000: break # TODO: remove this once the training process is fast enough to handle the full val set
                 continue
 
             neg_pids = []
 
             # there is an unhandled case where if the query is empty, then it doesn't show up in bm25
             # unclear how to handle, so for now, if that happens, we'll just randomly sample
-            if query_id not in neg_sample_run:
-                print(query_id, query)
-                
+            # second condition for when there is only one result returned by bm25
+            if query_id not in neg_sample_run or len(neg_sample_run[query_id]) == 1:
+
                 for _ in range(0, num_neg):
                     rand_idx = random.randint(0,num_options)
                     neg_pids.append(relevance_scores[rel_score_keys[rand_idx]])
@@ -56,7 +56,6 @@ def load_queries(path, relevance_scores, num_neg=2, type='train', neg_sample_run
                     neg_pids.append(returned_doc_id)
 
             queries[query_id] = {'qid': query_id, 'query': query, 'pos': [relevance_scores[query_id]], 'neg': neg_pids}
-    exit()
     return queries
 
 def load_webpages(path):
@@ -131,6 +130,8 @@ if __name__ == '__main__':
     query_path = args.queries
     corpus_path = args.corpus
 
+    typ = query_path.split('/')[-2]
+
     if args.use_pre_trained_model:
         logging.info("use pretrained SBERT model")
         model = SentenceTransformer(model_name)
@@ -144,8 +145,8 @@ if __name__ == '__main__':
     #model = torch.nn.DataParallel(model)
 
 
-    model_save_path = 'out/semantic_finetune_runs/train_bi-encoder-mnrl-{}-{}'.format(model_name.replace("/", "-"), datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
-
+    model_save_path = 'out/semantic_finetune_runs/train_bi-encoder-mnrl-{}-{}-{}'.format(model_name.replace("/", "-"), typ, datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+    print(model_save_path)
 
     relevance_scores = eval.load_rel_scores(query_path + 'relevance_scores.txt')
     print('Relevance scores loaded')

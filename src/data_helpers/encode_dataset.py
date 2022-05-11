@@ -7,17 +7,25 @@ import os
 import hnswlib
 
 # example run 
-# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_train.tsv --out ../data_2017-09/encoded_queries/queries_train.pkl
-# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_val.tsv --out ../data_2017-09/encoded_queries/queries_val.pkl
+# note encoding the training is for LSTM
+
+# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_train.tsv --out ../data_2017-09/queries/queries_train.pkl --per_comment True
+# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_val.tsv --out ../data_2017-09/queries/queries_val.pkl
+
+# python3 encode_dataset.py --query_path ../data_2017-09/queries_onlylast/queries_train.tsv --out ../data_2017-09/queries_onlylast/queries_train.pkl
+# python3 encode_dataset.py --query_path ../data_2017-09/queries_onlylast/queries_val.tsv --out ../data_2017-09/queries_onlylast/queries_val.pkl
+
+# python3 encode_dataset.py --query_path ../data_2017-09/queries_removelast/queries_train.tsv --out ../data_2017-09/queries_removelast/queries_train.pkl --per_comment True
+# python3 encode_dataset.py --query_path ../data_2017-09/queries_removelast/queries_val.tsv --out ../data_2017-09/queries_removelast/queries_val.pkl
+
 # python3 encode_dataset.py --webpages_path ../data_2017-09/webpages/ --out ../data_2017-09/encoded_webpages/
 
-def process_query(src: list, remove_last_comment=False) -> list:
-    src = src.split('<C>')
-    if remove_last_comment:
-        src = src[:-1]
-
-    processed_src = [re.sub('\n', '', x) for x in src]
-    return processed_src
+def process_query(src: str, per_comment=False) -> list:
+    src = re.sub('\n', ' ', src)
+    src = " ".join(src.split(' '))
+    if per_comment:
+        src = src.split('<C>')
+    return src
 
 if __name__ == '__main__':
     
@@ -26,6 +34,7 @@ if __name__ == '__main__':
     parser.add_argument('--webpages_path', help="path webpage directory")
     parser.add_argument('-model', help="path to model")
     parser.add_argument('--out', help='path to save encodings')
+    parser.add_argument('--per_comment', help='used for LSTM, if true, will return a list of individually embedded comments')
 
     args = parser.parse_args()
 
@@ -39,15 +48,21 @@ if __name__ == '__main__':
         index_name = 'webpages_baseline'
 
 
+    
+
 
     if args.query_path:
+        if args.per_comment:
+            per_comment = True
+        else:
+            per_comment = False
         encoded_queries = []
         with open(args.query_path, 'r') as f:
             for i,line in enumerate(f):
                 split_line = line.split('\t')
                 query_id = split_line[0]
                 query = " ".join(split_line[1:])
-                comments = process_query(query)
+                comments = process_query(query, per_comment=per_comment)
                 encoded_queries.append({"query_id": query_id, 'encoding': sbert_model.encode(comments, convert_to_tensor=True)})
 
                 if i % 1000 == 0:
