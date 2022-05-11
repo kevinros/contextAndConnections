@@ -38,6 +38,9 @@ def load_queries(path, relevance_scores, num_neg=1, type='train', neg_sample_run
             query_id = split_line[0]
             query = " ".join(split_line[1:])
 
+            # reverse for truncation, so that the most recent comments aren't removed
+            query = " <C> ".join(query.split('<C>')[::-1])
+
             if type == "val" or type == "test":
                 queries[query_id] = query
                 continue
