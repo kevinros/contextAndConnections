@@ -1,6 +1,6 @@
 import json
 from torch.utils.data import DataLoader
-from sentence_transformers import SentenceTransformer, models, evaluation, losses, InputExample
+from sentence_transformers import SentenceTransformer, models, evaluation, losses, InputExample, util
 import logging
 from datetime import datetime
 import os
@@ -13,7 +13,14 @@ from sentence_transformers.evaluation import SentenceEvaluator, SimilarityFuncti
 from eval import eval
 
 # example usage
+
+# to train:
 # python3 semantic_finetune.py --corpus data_2017-09/webpages/ --queries data_2017-09/queries/
+
+# to test:
+# python3 encode_dataset.py --webpages_path ../data_2017-09/webpages/ --out ../data_2017-09/encoded_webpages/ --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-dot-v5-queries-2022-05-10_21-05-52 --model_name 2022-05-10_21-05-52
+# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_val.tsv --out ../data_2017-09/queries/queries_val_2022-05-10_21-05-52.pkl
+# python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_2022-05-10_21-05-52.bin --index_map data_2017-09/encoded_webpages/int_id_map_webpages_2022-05-10_21-05-52.pkl --queries data_2017-09/queries/queries_val_2022-05-10_21-05-52.pkl --out out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-dot-v5-queries-2022-05-10_21-05-52/run.val_full.txt
 
 
 
@@ -33,7 +40,6 @@ def load_queries(path, relevance_scores, num_neg=1, type='train', neg_sample_run
 
             if type == "val" or type == "test":
                 queries[query_id] = query
-                if i > 2000: break # TODO: remove this once the training process is fast enough to handle the full val set
                 continue
 
             neg_pids = []
@@ -142,9 +148,6 @@ if __name__ == '__main__':
         pooling_model = models.Pooling(word_embedding_model.get_word_embedding_dimension(), args.pooling)
         model = SentenceTransformer(modules=[word_embedding_model, pooling_model])
 
-    #model = torch.nn.DataParallel(model)
-
-
     model_save_path = 'out/semantic_finetune_runs/train_bi-encoder-mnrl-{}-{}-{}'.format(model_name.replace("/", "-"), typ, datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
     print(model_save_path)
 
@@ -166,27 +169,20 @@ if __name__ == '__main__':
 
     train_dataset = WebpageDataset(train_queries, corpus=corpus)
     train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=train_batch_size)
-    train_loss = losses.MultipleNegativesRankingLoss(model=model)
+    train_loss = losses.MultipleNegativesRankingLoss(model=model, similarity_fct=util.dot_score)
 
     val_corpus = {}
     for query in val_queries:
         query_doc = relevance_scores[query]
         val_corpus[query_doc] = corpus[query_doc]
 
-    evaluator = evaluation.InformationRetrievalEvaluator(val_queries, val_corpus, relevance_scores, corpus_chunk_size=100)
-    # going to be super slow because it needs to encode the ENTIRE corpus
-    # for now, just compute embedding similarity
-    #val_query_src = [val_queries[x] for x in val_queries]
-    #val_query_tgt = [corpus[relevance_scores[x]] for x in val_queries]
-    #evaluator = evaluation.EmbeddingSimilarityEvaluator(val_query_src, val_query_tgt)
-
-    
+    evaluator = evaluation.InformationRetrievalEvaluator(val_queries, corpus, relevance_scores, corpus_chunk_size=1000)
 
     print('Beginning to train')
     model.fit(train_objectives=[(train_dataloader, train_loss)],
           epochs=num_epochs,
           evaluator=evaluator,
-          evaluation_steps=500,
+          evaluation_steps=3500,
           warmup_steps=args.warmup_steps,
           use_amp=True,
           optimizer_params = {'lr': args.lr},

@@ -32,13 +32,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--query_path', help="path to query tsv file")
     parser.add_argument('--webpages_path', help="path webpage directory")
-    parser.add_argument('-model', help="path to model")
+    parser.add_argument('--model', help="path to model")
+    parser.add_argument('--model_name', help="name to help distinguish encoding files")
     parser.add_argument('--out', help='path to save encodings')
     parser.add_argument('--per_comment', help='used for LSTM, if true, will return a list of individually embedded comments')
 
     args = parser.parse_args()
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = "4,5,6,7"
+    os.environ['CUDA_VISIBLE_DEVICES'] = "2" #different from 1, which is where the model is training
 
     if args.model:
         sbert_model = SentenceTransformer(args.model)
@@ -46,9 +47,6 @@ if __name__ == '__main__':
     else:
         sbert_model = SentenceTransformer('msmarco-distilbert-dot-v5')
         index_name = 'webpages_baseline'
-
-
-    
 
 
     if args.query_path:
@@ -78,7 +76,7 @@ if __name__ == '__main__':
         int_id_map = {}
         for i,file in enumerate(os.listdir(args.webpages_path)):
             webpage = json.load(open(args.webpages_path + file, 'r'))
-            encoded_webpage = sbert_model.encode(webpage['contents'])
+            encoded_webpage = sbert_model.encode(webpage['contents'], convert_to_tensor=True)
 
             encoded_webpages.append(encoded_webpage)
             encoded_webpage_ints.append(i)
@@ -88,9 +86,5 @@ if __name__ == '__main__':
                 print('Webpages processed: ' + str(i))
 
         print('Total encoded webpages :', len(encoded_webpages))
-        index = hnswlib.Index(space='ip', dim=768)
-        index.init_index(max_elements = len(encoded_webpages), ef_construction = 200, M = 16)
-        index.add_items(encoded_webpages, encoded_webpage_ints)
-        print('Index created')
-        index.save_index(args.out + index_name + '.bin')
+        pickle.dump(encoded_webpages, open(args.out + index_name + '.pkl', 'wb'))
         pickle.dump(int_id_map, open(args.out + 'int_id_map_' + index_name + '.pkl', 'wb'))

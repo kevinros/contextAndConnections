@@ -3,11 +3,12 @@ import pickle
 from sentence_transformers import util
 import torch
 import hnswlib
+import os
 
 # example usage
-# python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_baseline.bin --index_map data_2017-09/encoded_webpages/int_id_map_webpages_baseline.pkl --queries data_2017-09/queries/queries_val.pkl --out out/semantic_runs/run.val_full.txt
-# python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_baseline.bin --index_map data_2017-09/encoded_webpages/int_id_map_webpages_baseline.pkl --queries data_2017-09/queries_onlylast/queries_val.pkl --out out/semantic_runs/run.val_onlylast.txt
-# python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_baseline.bin --index_map data_2017-09/encoded_webpages/int_id_map_webpages_baseline.pkl --queries data_2017-09/queries_removelast/queries_val.pkl --out out/semantic_runs/run.val_removelast.txt
+# python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_baseline.pkl --index_map data_2017-09/encoded_webpages/int_id_map_webpages_baseline.pkl --queries data_2017-09/queries/queries_val.pkl --out out/semantic_runs/run.val_full.txt
+# python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_baseline.pkl --index_map data_2017-09/encoded_webpages/int_id_map_webpages_baseline.pkl --queries data_2017-09/queries_onlylast/queries_val.pkl --out out/semantic_runs/run.val_onlylast.txt
+# python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_baseline.pkl --index_map data_2017-09/encoded_webpages/int_id_map_webpages_baseline.pkl --queries data_2017-09/queries_removelast/queries_val.pkl --out out/semantic_runs/run.val_removelast.txt
 
 def semantic_baseline(index, int_id_map, queries, k=10):
     run = []
@@ -37,19 +38,27 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    queries = pickle.load(open(args.queries, 'rb'))
-    print('Loaded queries')
+    os.environ['CUDA_VISIBLE_DEVICES'] = "2"
 
-    index = hnswlib.Index(space='ip', dim=768)
-    index.set_ef(1000)
-    index.load_index(args.index)
+
+    queries = pickle.load(open(args.queries, 'rb'))
+
+    query_ids = [x['query_id'] for x in queries]
+    queries = [x['encoding'] for x in queries]
+
+    print('Loaded queries')
 
     int_id_map = pickle.load(open(args.index_map, 'rb'))
 
+    corpus = pickle.load(open(args.index, 'rb'))
+
+    hits = util.semantic_search(queries, corpus, score_function=util.dot_score)
+    run = []
+    for i,query in enumerate(hits):
+        for j, result in enumerate(query):
+            # 0 Q0 0 1 193.457108 Anserini
+            run.append(' '.join([str(query_ids[i]), 'Q0', str(int_id_map[result['corpus_id']]), str(j), str(result['score']), 'Semantic Search']))
     print('Index set up')
-
-    run = semantic_baseline(index, int_id_map, queries)
-
 
     with open(args.out, 'w') as f:
         for line in run:
