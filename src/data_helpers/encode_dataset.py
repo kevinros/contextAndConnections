@@ -25,6 +25,8 @@ def process_query(src: str, per_comment=False) -> list:
     src = " ".join(src.split(' '))
     if per_comment:
         src = src.split('<C>')
+    else:
+        src = " <C> ".join(src.split('<C>')[::-1]) #reverses, so that only older comments are truncated
     return src
 
 if __name__ == '__main__':
