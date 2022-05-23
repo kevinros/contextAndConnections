@@ -39,7 +39,7 @@ def extract_urls(comment_body, ignore_type={}, ignore_domains={}, valid_domains=
         if domain in ignore_domains: continue
 
         
-        if valid_domains != {} and url not in valid_domains: continue
+        if valid_domains != {} and domain not in valid_domains: continue
 
         
         cleaned_valid_urls.append(url)

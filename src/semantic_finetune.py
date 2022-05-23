@@ -15,7 +15,10 @@ from eval import eval
 # example usage
 
 # to train:
-# python3 semantic_finetune.py --corpus data_2017-09/webpages/ --queries data_2017-09/queries/
+# python3 semantic_finetune.py --corpus data_2017-09/webpages/ --queries data_2017-09/queries/ --model_name msmarco-distilbert-cos-v5 -- neg_sample_run_path out/bm25_runs/run.train_8_0.99.txt
+# python3 semantic_finetune.py --corpus data_2017-09/webpages/ --queries data_2017-09/queries_onlylast/ --model_name msmarco-distilbert-cos-v5 --neg_sample_run_path out/bm25_runs/run.onlylast.train_4_0.9.txt
+# python3 semantic_finetune.py --corpus data_2017-09/webpages/ --queries data_2017-09/queries_removelast/ --model_name msmarco-distilbert-cos-v5 --neg_sample_run_path out/bm25_runs/run.removelast.train_7_0.99.txt
+
 
 # to test:
 # python3 encode_dataset.py --webpages_path ../data_2017-09/webpages/ --out ../data_2017-09/encoded_webpages/ --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-dot-v5-queries-2022-05-10_21-05-52 --model_name 2022-05-10_21-05-52
@@ -24,9 +27,10 @@ from eval import eval
 
 
 
-def load_queries(path, relevance_scores, num_neg=1, type='train', neg_sample_run_path='out/bm25_runs/run.train_8_0.99.txt'):
+def load_queries(path, relevance_scores, neg_sample_run_path=None, num_neg=1, type='train'):
     queries = {}
-    neg_sample_run = eval.load_run(neg_sample_run_path)
+    if type == "train":
+        neg_sample_run = eval.load_run(neg_sample_run_path)
     
     rel_score_keys = list(relevance_scores.keys())
     num_options = len(rel_score_keys)-1
@@ -120,6 +124,7 @@ if __name__ == '__main__':
     parser.add_argument("--num_negs_per_system", default=1, type=int)
     parser.add_argument("--use_pre_trained_model", default=True, action="store_true")
     parser.add_argument("--use_all_queries", default=False, action="store_true")
+    parser.add_argument("--neg_sample_run_path", required=True)
 
     parser.add_argument("--corpus", required=True)
     parser.add_argument("--queries", required=True)
@@ -157,7 +162,9 @@ if __name__ == '__main__':
     relevance_scores = eval.load_rel_scores(query_path + 'relevance_scores.txt')
     print('Relevance scores loaded')
 
-    train_queries = load_queries(query_path + 'queries_train.tsv', relevance_scores, num_negs_per_system)
+    print('Using ', args.neg_sample_run_path, ' for negative samples')
+
+    train_queries = load_queries(query_path + 'queries_train.tsv', relevance_scores, num_neg = num_negs_per_system, neg_sample_run_path=args.neg_sample_run_path)
     val_queries = load_queries(query_path + 'queries_val.tsv', relevance_scores, type="val")
 
     print('Queries loaded')
@@ -172,14 +179,14 @@ if __name__ == '__main__':
 
     train_dataset = WebpageDataset(train_queries, corpus=corpus)
     train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=train_batch_size)
-    train_loss = losses.MultipleNegativesRankingLoss(model=model, similarity_fct=util.dot_score)
+    train_loss = losses.MultipleNegativesRankingLoss(model=model, similarity_fct=util.cos_sim) #util.dot_score
 
     val_corpus = {}
     for query in val_queries:
         query_doc = relevance_scores[query]
         val_corpus[query_doc] = corpus[query_doc]
 
-    evaluator = evaluation.InformationRetrievalEvaluator(val_queries, corpus, relevance_scores, corpus_chunk_size=1000)
+    evaluator = evaluation.InformationRetrievalEvaluator(val_queries, corpus, relevance_scores, corpus_chunk_size=1000)#, main_score_function="dot_score")
 
     print('Beginning to train')
     model.fit(train_objectives=[(train_dataloader, train_loss)],

@@ -21,6 +21,8 @@ rm ../data_2017-09/RS_2017-09.zst
 # compression commands
 tar -cvzf queries.tar.gz queries/
 tar -cvzf webpages.tar.gz webpages/
+tar -cvzf encoded_webpages.tar.gz encoded_webpages/
+
 
 # stopwords
 https://github.com/stopwords-iso/stopwords-en/blob/master/stopwords-en.txt
