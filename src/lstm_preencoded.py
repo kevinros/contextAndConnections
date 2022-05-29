@@ -25,13 +25,12 @@ class MarginMSELoss(nn.Module):
         return self.loss_fct(diff, margin)
 
 
-
-
 if __name__ == '__main__':
     
     parser = argparse.ArgumentParser()
     parser.add_argument('--relevance_scores', help="path to relevance scores")
     parser.add_argument('--corpus', help="path to website encodings")
+    parser.add_argument('--index_map', help="path to index - webpage id map")
     parser.add_argument('--queries_train', help="path to queries (train)")
     parser.add_argument('--queries_val', help="path to queries (validation)")
     parser.add_argument('--out', help="path to output directory")
@@ -45,6 +44,10 @@ if __name__ == '__main__':
 
     corpus = pickle.load(open(args.corpus, 'rb'))
 
+    int_id_map = pickle.load(open(args.index_map, 'rb'))
+
+    id_int_map = {value:key for key,value in int_id_map.items()}
+
     # need to map queries to websites
     relevance_scores = open(args.relevance_scores, 'r')
     query_webpage_map = {}
@@ -55,20 +58,22 @@ if __name__ == '__main__':
 
     input_size = 768
     hidden_size = 768
-    num_layers = 2
+    num_layers = 4
     learning_rate = 1e-4
     warm_up_rate = 0.1
-    epochs = 5
+    epochs = 20
 
 
     model = lstm.URLSTM(input_size, hidden_size, num_layers)
     model.to('cuda:0')
 
-    loss_fn = MarginMSELoss()
+    # loss_fn = MarginMSELoss()
+
+    loss_fn = nn.CosineEmbeddingLoss(margin=0.5)
+
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-
-    trainer = lstm.LSTMTrainer(model, loss_fn, optimizer, corpus, query_webpage_map)
+    trainer = lstm.LSTMTrainer(model, loss_fn, optimizer, corpus, query_webpage_map, id_int_map, int_id_map)
 
     for epoch in range(epochs):
         print('Epoch: ', epoch)
