@@ -15,15 +15,9 @@ from eval import eval
 # example usage
 
 # to train:
-# python3 semantic_finetune.py --corpus data_2017-09/webpages/ --queries data_2017-09/queries/ --model_name msmarco-distilbert-cos-v5 -- neg_sample_run_path out/bm25_runs/run.train_8_0.99.txt
-# python3 semantic_finetune.py --corpus data_2017-09/webpages/ --queries data_2017-09/queries_onlylast/ --model_name msmarco-distilbert-cos-v5 --neg_sample_run_path out/bm25_runs/run.onlylast.train_4_0.9.txt
+# python3 semantic_finetune.py --corpus data_2017-09/webpages/ --queries data_2017-09/queries/ --model_name msmarco-distilbert-cos-v5 --neg_sample_run_path out/bm25_runs/v2_run.train_8_0.99.txt
+# python3 semantic_finetune.py --corpus data_2017-09/webpages/ --queries data_2017-09/queries_onlylast/ --model_name msmarco-distilbert-cos-v5 --neg_sample_run_path out/bm25_runs/v2_run.onlylast.train_4_0.9.txt
 # python3 semantic_finetune.py --corpus data_2017-09/webpages/ --queries data_2017-09/queries_removelast/ --model_name msmarco-distilbert-cos-v5 --neg_sample_run_path out/bm25_runs/run.removelast.train_7_0.99.txt
-
-
-# to test:
-# python3 encode_dataset.py --webpages_path ../data_2017-09/webpages/ --out ../data_2017-09/encoded_webpages/ --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-dot-v5-queries-2022-05-10_21-05-52 --model_name 2022-05-10_21-05-52
-# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_val.tsv --out ../data_2017-09/queries/queries_val_2022-05-10_21-05-52.pkl
-# python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_2022-05-10_21-05-52.bin --index_map data_2017-09/encoded_webpages/int_id_map_webpages_2022-05-10_21-05-52.pkl --queries data_2017-09/queries/queries_val_2022-05-10_21-05-52.pkl --out out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-dot-v5-queries-2022-05-10_21-05-52/run.val_full.txt
 
 
 

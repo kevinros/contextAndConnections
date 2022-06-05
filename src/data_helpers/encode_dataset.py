@@ -35,14 +35,14 @@ import hnswlib
 
 # the following are for semantic finetune, make sure to change data to correspond to model, and make sure to change out to match full,last,proactive
 # full
-# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_val.tsv --out ../data_2017-09/queries/queries_val_2022-05-21_20-12-34.pkl --model_name 2022-05-21_20-12-34 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries-2022-05-21_20-12-34
-# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_test.tsv --out ../data_2017-09/queries/queries_test_2022-05-21_20-12-34.pkl --model_name 2022-05-21_20-12-34 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries-2022-05-21_20-12-34
-# python3 encode_dataset.py --webpages_path ../data_2017-09/webpages/ --out ../data_2017-09/encoded_webpages/ --model_name 2022-05-21_20-12-34 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries-2022-05-21_20-12-34
+# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_val.tsv --out ../data_2017-09/queries/queries_val_2022-06-01_12-04-50.pkl --model_name 2022-06-01_12-04-50 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries-2022-06-01_12-04-50
+# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_test.tsv --out ../data_2017-09/queries/queries_test_2022-06-01_12-04-50.pkl --model_name 2022-06-01_12-04-50 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries-2022-06-01_12-04-50
+# python3 encode_dataset.py --webpages_path ../data_2017-09/webpages/ --out ../data_2017-09/encoded_webpages/ --model_name 2022-06-01_12-04-50 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries-2022-06-01_12-04-50
 
 # onlylast
-# python3 encode_dataset.py --query_path ../data_2017-09/queries_onlylast/queries_val.tsv --out ../data_2017-09/queries_onlylast/queries_val_2022-05-22_10-35-21.pkl --model_name 2022-05-21_20-12-34 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries_onlylast-2022-05-22_10-35-21
-# python3 encode_dataset.py --query_path ../data_2017-09/queries_onlylast/queries_test.tsv --out ../data_2017-09/queries_onlylast/queries_test_2022-05-22_10-35-21.pkl --model_name 2022-05-21_20-12-34 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries_onlylast-2022-05-22_10-35-21
-# python3 encode_dataset.py --webpages_path ../data_2017-09/webpages/ --out ../data_2017-09/encoded_webpages/ --model_name 2022-05-22_10-35-21 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries_onlylast-2022-05-22_10-35-21
+# python3 encode_dataset.py --query_path ../data_2017-09/queries_onlylast/queries_val.tsv --out ../data_2017-09/queries_onlylast/queries_val_2022-06-02_21-24-49.pkl --model_name 2022-06-02_21-24-49 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries_onlylast-2022-06-02_21-24-49
+# python3 encode_dataset.py --query_path ../data_2017-09/queries_onlylast/queries_test.tsv --out ../data_2017-09/queries_onlylast/queries_test_2022-06-02_21-24-49.pkl --model_name 2022-06-02_21-24-49 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries_onlylast-2022-06-02_21-24-49
+# python3 encode_dataset.py --webpages_path ../data_2017-09/webpages/ --out ../data_2017-09/encoded_webpages/ --model_name 2022-06-02_21-24-49 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries_onlylast-2022-06-02_21-24-49
 
 # removelast
 # python3 encode_dataset.py --query_path ../data_2017-09/queries_removelast/queries_val.tsv --out ../data_2017-09/queries_removelast/queries_val_2022-05-22_18-44-28.pkl --model_name 2022-05-22_18-44-28 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries_removelast-2022-05-22_18-44-28
@@ -52,8 +52,8 @@ import hnswlib
 
 
 # onlylast model but full, however per comment (for LSTM)
-# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_train.tsv --out ../data_2017-09/queries/queries_train_2022-05-22_10-35-21_percomment.pkl --model_name 2022-05-21_20-12-34 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries_onlylast-2022-05-22_10-35-21
-# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_val.tsv --out ../data_2017-09/queries/queries_val_2022-05-22_10-35-21_percomment.pkl --model_name 2022-05-21_20-12-34 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries_onlylast-2022-05-22_10-35-21
+# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_train.tsv --out ../data_2017-09/queries/queries_train_2022-05-22_10-35-21_percomment.pkl --model_name 2022-05-21_20-12-34 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries_onlylast-2022-05-22_10-35-21 --per_comment True
+# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_val.tsv --out ../data_2017-09/queries/queries_val_2022-05-22_10-35-21_percomment.pkl --model_name 2022-05-21_20-12-34 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries_onlylast-2022-05-22_10-35-21 --per_comment True
 
 
 

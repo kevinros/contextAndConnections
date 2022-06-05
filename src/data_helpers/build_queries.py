@@ -15,7 +15,15 @@ def process_query(src: list, url: str, mode='all') -> str:
     if mode == 'remove_last':
         src = src[:-1]
     else:
+        # add heuristic for removing mobile wiki urls, too
+        # to reproduce old results, just comment out this block
+        if 'wikipedia' in url:
+            url_mobile = url[:11] + 'm.' + url[11:]
+            src[-1] = re.sub(re.escape(url_mobile), ' ', src[-1])
+
+            
         src[-1] = re.sub(re.escape(url), ' ', src[-1])
+
 
     if mode == "only_last":
         src = [src[-1]]
