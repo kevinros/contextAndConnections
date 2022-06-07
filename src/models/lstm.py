@@ -16,7 +16,7 @@ class URLSTM(nn.Module):
         output, state = self.lstm(x, prev_state)
         return output, state
 
-    def init_state(self):
+    def init_state(self, sequence_length):
         return (torch.zeros(self.num_layers, 1, self.input_size),
                 torch.zeros(self.num_layers, 1, self.input_size))
 
@@ -40,11 +40,12 @@ class LSTMTrainer():
         self.model.train()
 
         for i,query in enumerate(X_train):
+
             query_id = query['query_id']
             x = query['encoding']
             y = self.corpus[self.id_int_map[self.query_webpage_map[query_id]]]
 
-            state_h, state_c = self.model.init_state()
+            state_h, state_c = self.model.init_state(len(x))
             state_h = state_h.to('cuda:0')
             state_c = state_c.to('cuda:0')
 
@@ -53,14 +54,31 @@ class LSTMTrainer():
             condition = torch.tensor(1).to('cuda:0')
             loss = self.loss_fn(state_h[-1][0], y, condition)
 
-            neg_idx = random.randint(0,len(X_train)-1)
+            for i in range(3):
+                neg_idx = random.randint(0, len(X_train) - 1)
+                
+                if neg_idx == i: continue
 
-            x_neg_query = X_train[neg_idx]
-            x_neg_query_id = x_neg_query['query_id']
-            y_neg = self.corpus[self.id_int_map[self.query_webpage_map[x_neg_query_id]]]
+                x_neg_query = X_train[neg_idx]
+                x_neg = x_neg_query['encoding']
+                x_neg_query_id = x_neg_query['query_id']
+                y_neg = self.corpus[self.id_int_map[self.query_webpage_map[x_neg_query_id]]]
 
-            condition = torch.tensor(1).to('cuda:0')
-            loss += self.loss_fn(state_h[-1][0], y_neg, condition)
+                state_h, state_c = self.model.init_state(len(x_neg))
+                state_h = state_h.to('cuda:0')
+                state_c = state_c.to('cuda:0')
+
+                pred, (state_h, state_c) = self.model(torch.unsqueeze(x_neg, 1), (state_h, state_c))
+
+                condition = torch.tensor(1).to('cuda:0')
+                loss += self.loss_fn(state_h[-1][0], y_neg, condition)
+
+            # condition = torch.tensor(0).to('cuda:0')
+            # loss_neg = self.loss_fn(state_h[-1][0], y_neg, condition)
+            # neg_idx = random.randint(0,len(X_train)-1)
+            # x_neg_query = X_train[neg_idx]
+            # x_neg_query_id = x_neg_query['query_id']
+            
             # loss = self.loss_fn(pred[-1].squeeze(), y, y_neg, self.margin)
                 
             self.optimizer.zero_grad()
@@ -76,28 +94,30 @@ class LSTMTrainer():
     def val(self, X_val):
         total_loss = 0
         self.model.eval()
+
         for i,query in enumerate(X_val):
 
             query_id = query['query_id']
             x = query['encoding']
             y = self.corpus[self.id_int_map[self.query_webpage_map[query_id]]]
 
-            state_h, state_c = self.model.init_state()
+            state_h, state_c = self.model.init_state(len(x))
             state_h = state_h.to('cuda:0')
             state_c = state_c.to('cuda:0')
 
-            # print(state_h.shape, state_c.shape, x.shape)
-
             pred, (state_h, state_c) = self.model(torch.unsqueeze(x, 1), (state_h, state_c))
 
-            neg_idx = random.randint(0,len(X_val)-1)
-
-            x_neg_query = X_val[neg_idx]
-            x_neg_query_id = x_neg_query['query_id']
-            y_neg = self.corpus[self.id_int_map[self.query_webpage_map[x_neg_query_id]]]
-
             condition = torch.tensor(1).to('cuda:0')
-            loss = self.loss_fn(state_h[-1][0], y_neg, condition)
+            loss = self.loss_fn(state_h[-1][0], y, condition)
+
+            # neg_idx = random.randint(0,len(X_val)-1)
+
+            # x_neg_query = X_val[neg_idx]
+            # x_neg_query_id = x_neg_query['query_id']
+            # y_neg = self.corpus[self.id_int_map[self.query_webpage_map[x_neg_query_id]]]
+
+            # condition = torch.tensor(1).to('cuda:0')
+            # loss += self.loss_fn(state_h[-1][0], y_neg, condition)
             # loss = self.loss_fn(pred[-1].squeeze(), y, y_neg, self.margin)
 
             total_loss += loss.item()
@@ -111,6 +131,7 @@ class LSTMTrainer():
         # so that we can do cosine scores and recover the actual id of the webpage
 
         just_corpus_encodings = torch.unsqueeze(self.corpus[0], dim=0)
+
         for x in self.corpus[1:]:
             just_corpus_encodings = torch.cat((just_corpus_encodings, torch.unsqueeze(x, dim=0)), 0)
 
@@ -126,7 +147,7 @@ class LSTMTrainer():
             query_id = query['query_id']
             x = query['encoding']
 
-            state_h, state_c = self.model.init_state()
+            state_h, state_c = self.model.init_state(len(x))
             state_h = state_h.to('cuda:0')
             state_c = state_c.to('cuda:0')
             pred, (state_h, state_c) = self.model(torch.unsqueeze(x, 1), (state_h, state_c))
@@ -138,7 +159,7 @@ class LSTMTrainer():
 
             for j, (score, idx) in enumerate(zip(top_results[0], top_results[1])):
                 # 0 Q0 0 1 193.457108 Anserini
-                # print(self.int_id_map[idx.item()])
+                # before it was webpage_id_map[i], but this is a tensor, we want the filename associated with that webpage encoding
                 run.append(' '.join([str(query_id), 'Q0', str(self.int_id_map[idx.item()]), str(j), str(score.item()), 'LSTM']))
 
         return run
