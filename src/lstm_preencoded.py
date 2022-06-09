@@ -55,14 +55,12 @@ if __name__ == '__main__':
         split_line = line.split()
         query_webpage_map[split_line[0]] = split_line[2]
 
-
     input_size = 768
     hidden_size = 768
-    num_layers = 4
+    num_layers = 1
     learning_rate = 1e-4
     warm_up_rate = 0.1
-    epochs = 20
-
+    epochs = 5
 
     model = lstm.URLSTM(input_size, hidden_size, num_layers)
     model.to('cuda:0')
@@ -70,9 +68,7 @@ if __name__ == '__main__':
     # loss_fn = MarginMSELoss()
 
     loss_fn = nn.CosineEmbeddingLoss(margin=0.5)
-
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-
     trainer = lstm.LSTMTrainer(model, loss_fn, optimizer, corpus, query_webpage_map, id_int_map, int_id_map)
 
     for epoch in range(epochs):
