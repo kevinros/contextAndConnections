@@ -11,8 +11,6 @@ import torch
 # example usage
 # python3 lstm_preencoded.py --relevance_scores data_2017-09/queries/relevance_scores.txt --corpus data_2017-09/encoded_webpages/webpages.pkl --queries_train data_2017-09/encoded_queries/queries_train.pkl --queries_val data_2017-09/encoded_queries/queries_val.pkl --out out/lstm_preencoded_runs/
 
-
-
 class MarginMSELoss(nn.Module):
     def __init__(self, similarity_fct=util.pairwise_dot_score):
         super(MarginMSELoss, self).__init__()
@@ -69,7 +67,7 @@ if __name__ == '__main__':
 
     loss_fn = nn.CosineEmbeddingLoss(margin=0.5)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-    trainer = lstm.LSTMTrainer(model, loss_fn, optimizer, corpus, query_webpage_map, id_int_map, int_id_map)
+    trainer = lstm.LSTMTrainer(model, loss_fn, optimizer, corpus, query_webpage_map, id_int_map, int_id_map, relevance_scores)
 
     for epoch in range(epochs):
         print('Epoch: ', epoch)
