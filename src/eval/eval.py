@@ -14,7 +14,6 @@ def load_run(path_to_run):
         for line in f:
             line = line.split(' ')
             query_id = line[0]
-
             if query_id not in run:
                 run[query_id] = []
             run[query_id].append(line[2])
@@ -28,25 +27,38 @@ def load_query_ids(path_to_queries):
         for i,line in enumerate(f):
             split_line = line.split('\t')
             query_id = split_line[0]
-            queries[query_id] = True
+            queries[query_id] = split_line[1]
     return queries
 
 
-def compute_mrr10(relevance_scores, run, query_ids):
-    scores = []
-    for query in run:
+def compute_mrr10(relevance_scores, run, query_ids, raw=False):
+    scores = {}
+    for query in query_ids:
+        scores[query] = 0
+        if query not in run:
+            continue
         ground_truth = relevance_scores[query]
         for i,returned_result in enumerate(run[query][:10]):
             if ground_truth == returned_result:
-                scores.append(1 / (i+1))
+                scores[query] = 1 / (i+1)
+                break
+    if raw:
+        return scores
+    scores = list(scores.values())
     return sum(scores) / len(query_ids)
 
-def compute_p1(relevance_scores, run, query_ids):
-    scores = []
-    for query in run:
+def compute_p1(relevance_scores, run, query_ids, raw=False):
+    scores = {}
+    for query in query_ids:
+        scores[query] = 0
+        if query not in run:
+            continue
         ground_truth = relevance_scores[query]
         if run[query][0] == ground_truth:
-            scores.append(1)
+            scores[query] = 1
+    if raw:
+        return scores
+    scores = list(scores.values())
     return sum(scores) / len(query_ids)
 
 
