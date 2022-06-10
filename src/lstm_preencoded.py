@@ -46,6 +46,11 @@ if __name__ == '__main__':
 
     id_int_map = {value:key for key,value in int_id_map.items()}
 
+    just_corpus_encodings = torch.unsqueeze(corpus[0], dim=0)
+
+    for x in corpus[1:]:
+        just_corpus_encodings = torch.cat((just_corpus_encodings, torch.unsqueeze(x, dim=0)), 0)
+
     # need to map queries to websites
     relevance_scores = open(args.relevance_scores, 'r')
     query_webpage_map = {}
@@ -58,7 +63,7 @@ if __name__ == '__main__':
     num_layers = 1
     learning_rate = 1e-4
     warm_up_rate = 0.1
-    epochs = 5
+    epochs = 15
 
     model = lstm.URLSTM(input_size, hidden_size, num_layers)
     model.to('cuda:0')
@@ -67,7 +72,7 @@ if __name__ == '__main__':
 
     loss_fn = nn.CosineEmbeddingLoss(margin=0.5)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-    trainer = lstm.LSTMTrainer(model, loss_fn, optimizer, corpus, query_webpage_map, id_int_map, int_id_map, relevance_scores)
+    trainer = lstm.LSTMTrainer(model, loss_fn, optimizer, corpus, query_webpage_map, id_int_map, int_id_map, relevance_scores, just_corpus_encodings)
 
     for epoch in range(epochs):
         print('Epoch: ', epoch)
@@ -76,7 +81,7 @@ if __name__ == '__main__':
             warm_up_rate *= 2
 
         loss_train = trainer.train(queries_train)
-        loss_val = trainer.val(queries_val)
+        loss_val = trainer.val(queries_val, epoch)
         print('Total train loss: ', loss_train)
         print('Total validation loss: ', loss_val)
     run = trainer.test(queries_val)
