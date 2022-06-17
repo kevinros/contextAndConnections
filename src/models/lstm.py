@@ -41,7 +41,8 @@ class LSTMTrainer():
         total_loss = 0
         self.model.train()
 
-        for i,query in enumerate(X_train):
+        # experiment with different batch sizes
+        for i, query in enumerate(X_train):
 
             query_id = query['query_id']
             x = query['encoding']
@@ -65,20 +66,20 @@ class LSTMTrainer():
             condition = torch.tensor(1).to('cuda:0')
             loss = self.loss_fn(state_h[-1][0], y, condition)
 
-            for i in range(5):
+            for i in range(15):
                 neg_idx = random.randint(0, len(X_train) - 1)
                 
                 if neg_idx == i: continue
 
                 x_neg_query = X_train[neg_idx]
                 x_neg = x_neg_query['encoding']
+
                 x_neg_query_id = x_neg_query['query_id']
                 y_neg = self.corpus[self.id_int_map[self.query_webpage_map[x_neg_query_id]]]
 
                 # state_h, state_c = self.model.init_state(len(x_neg))
                 # state_h = state_h.to('cuda:0')
                 # state_c = state_c.to('cuda:0')
-
                 # pred, (state_h, state_c) = self.model(torch.unsqueeze(x_neg, 1), (state_h, state_c))
 
                 condition = torch.tensor(-1).to('cuda:0')
@@ -120,10 +121,6 @@ class LSTMTrainer():
                 # for proactive
                 # if x.shape[0] != 1:
                 #     x = x[:-1, :]       
-
-                # just last comment
-                # if x.shape[0] != 1:
-                #     x = x[1:, :]
 
                 y = self.corpus[self.id_int_map[self.query_webpage_map[query_id]]]
 
@@ -181,10 +178,6 @@ class LSTMTrainer():
 
             query_id = query['query_id']
             x = query['encoding']
-
-            # just last comment
-            # if x.shape[0] != 1:
-            #     x = x[1:, :]
 
             # for proactive
             # if x.shape[0] != 1:

@@ -63,8 +63,8 @@ if __name__ == '__main__':
     hidden_size = 768
     num_layers = 1
     learning_rate = 1e-4
-    warm_up_rate = 0.1
-    epochs = 7
+    warm_up_rate = 0.1 # 0.1
+    epochs = 10
 
     model = lstm.URLSTM(input_size, hidden_size, num_layers)
     model.to('cuda:0')
@@ -89,7 +89,7 @@ if __name__ == '__main__':
 
     torch.save(model, args.out + 'model')
 
-    with open(args.out + 'run.val.txt', 'w') as f:
+    with open(args.out + 'run.val' + str(epochs) + '_' + str(num_layers) + '_' + str(warm_up_rate) + '.txt', 'w') as f:
         for line in run:
             f.write(line + '\n')
     
