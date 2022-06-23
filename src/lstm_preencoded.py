@@ -9,7 +9,7 @@ import torch
 
 
 # example usage
-# python3 lstm_preencoded.py --relevance_scores data_2017-09/queries/relevance_scores.txt --corpus data_2017-09/encoded_webpages/webpages.pkl --queries_train data_2017-09/encoded_queries/queries_train.pkl --queries_val data_2017-09/encoded_queries/queries_val.pkl --out out/lstm_preencoded_runs/
+# python3 lstm_preencoded.py --index_map data_2017-09/encoded_webpages/int_id_map_webpages_2022-06-02_21-24-49.pkl --relevance_scores data_2017-09/queries/relevance_scores.txt --corpus data_2017-09/encoded_webpages/webpages_2022-06-02_21-24-49.pkl --queries_train data_2017-09/queries/queries_train_2022-06-02_21-24-49_percomment.pkl --queries_val data_2017-09/queries/queries_val_2022-06-02_21-24-49_percomment.pkl --out out/lstm_preencoded_runs/
 
 class MarginMSELoss(nn.Module):
     def __init__(self, similarity_fct=util.pairwise_dot_score):
@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = "4,5,6,7"
+    os.environ['CUDA_VISIBLE_DEVICES'] = "0,1,2,3"
 
     queries_train = pickle.load(open(args.queries_train, 'rb'))
     queries_val= pickle.load(open(args.queries_val, 'rb'))
@@ -55,9 +55,9 @@ if __name__ == '__main__':
 
     input_size = 768
     hidden_size = 768
-    num_layers = 1
-    learning_rate = 1e-4
-    warm_up_rate = 0.1
+    num_layers = 3
+    learning_rate = 1e-5
+    warm_up_rate = 1
     epochs = 5
 
     model = lstm.URLSTM(input_size, hidden_size, num_layers)
@@ -65,8 +65,9 @@ if __name__ == '__main__':
 
     # loss_fn = MarginMSELoss()
 
-    loss_fn = nn.CosineEmbeddingLoss(margin=0.5)
+    loss_fn = nn.CosineEmbeddingLoss(margin=0.1)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    #optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
     trainer = lstm.LSTMTrainer(model, loss_fn, optimizer, corpus, query_webpage_map, id_int_map, int_id_map, relevance_scores)
 
     for epoch in range(epochs):

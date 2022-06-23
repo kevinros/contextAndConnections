@@ -4,19 +4,8 @@ import re
 from sentence_transformers import SentenceTransformer
 import pickle
 import os
-import hnswlib
 
 # example runs
-
-# the following are old
-# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_train.tsv --out ../data_2017-09/queries/queries_train_pc.pkl --per_comment True
-# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_val.tsv --out ../data_2017-09/queries/queries_val_pc.pkl --per_comment True
-# python3 encode_dataset.py --query_path ../data_2017-09/queries_onlylast/queries_train.tsv --out ../data_2017-09/queries_onlylast/queries_train.pkl
-# python3 encode_dataset.py --query_path ../data_2017-09/queries_onlylast/queries_val.tsv --out ../data_2017-09/queries_onlylast/queries_val.pkl
-# python3 encode_dataset.py --query_path ../data_2017-09/queries_removelast/queries_train.tsv --out ../data_2017-09/queries_removelast/queries_train.pkl --per_comment True
-# python3 encode_dataset.py --query_path ../data_2017-09/queries_removelast/queries_val.tsv --out ../data_2017-09/queries_removelast/queries_val.pkl
-# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_train.tsv --out ../data_2017-09/queries/queries_train_cos.pkl --model msmarco-distilbert-cos-v5 --model_name msmarco-distilbert-cos-v5
-
 
 # for the semantic baseline validation runs
 # python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_val.tsv --out ../data_2017-09/queries/queries_val_cos.pkl --model msmarco-distilbert-cos-v5 --model_name msmarco-distilbert-cos-v5
@@ -52,8 +41,9 @@ import hnswlib
 
 
 # onlylast model but full, however per comment (for LSTM)
-# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_train.tsv --out ../data_2017-09/queries/queries_train_2022-05-22_10-35-21_percomment.pkl --model_name 2022-05-21_20-12-34 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries_onlylast-2022-05-22_10-35-21 --per_comment True
-# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_val.tsv --out ../data_2017-09/queries/queries_val_2022-05-22_10-35-21_percomment.pkl --model_name 2022-05-21_20-12-34 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries_onlylast-2022-05-22_10-35-21 --per_comment True
+# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_train.tsv --out ../data_2017-09/queries/queries_train_2022-06-02_21-24-49_percomment.pkl --model_name 2022-06-02_21-24-49 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries_onlylast-2022-06-02_21-24-49 --per_comment True
+# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_val.tsv --out ../data_2017-09/queries/queries_val_2022-06-02_21-24-49_percomment.pkl --model_name 2022-06-02_21-24-49 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries_onlylast-2022-06-02_21-24-49 --per_comment True
+# python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_test.tsv --out ../data_2017-09/queries/queries_test_2022-06-02_21-24-49_percomment.pkl --model_name 2022-06-02_21-24-49 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries_onlylast-2022-06-02_21-24-49 --per_comment True
 
 
 

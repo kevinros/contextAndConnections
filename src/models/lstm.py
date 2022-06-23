@@ -12,9 +12,19 @@ class URLSTM(nn.Module):
         self.num_layers = num_layers
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers)
 
-    def forward(self, x, prev_state):
-        output, state = self.lstm(x, prev_state)
-        return output, state
+        self.linear1 = nn.Linear(hidden_size*2, hidden_size*2)
+        self.sigmoid = nn.Sigmoid()
+        self.linear2 = nn.Linear(hidden_size*2, hidden_size)
+
+
+    def forward(self, x, prev_state, last_comment):
+        pred, (state_h, state_c) = self.lstm(x, prev_state)
+        merged = torch.cat((last_comment, state_h[-1][0]))
+        out = self.linear1(merged)
+        out = self.sigmoid(out)
+        out = self.linear2(out)
+        out = self.sigmoid(out)
+        return out
 
     def init_state(self, sequence_length):
         return (torch.zeros(self.num_layers, 1, self.input_size),
@@ -41,7 +51,6 @@ class LSTMTrainer():
         self.model.train()
 
         for i,query in enumerate(X_train):
-
             query_id = query['query_id']
             x = query['encoding']
             y = self.corpus[self.id_int_map[self.query_webpage_map[query_id]]]
@@ -50,10 +59,13 @@ class LSTMTrainer():
             state_h = state_h.to('cuda:0')
             state_c = state_c.to('cuda:0')
 
-            pred, (state_h, state_c) = self.model(torch.unsqueeze(x, 1), (state_h, state_c))
+            if x.size()[0] == 1:
+                output = self.model(torch.unsqueeze(x, 1), (state_h, state_c), x[-1])
+            else:
+                output = self.model(torch.unsqueeze(x[:-1], 1), (state_h, state_c), x[-1])
             
             condition = torch.tensor(1).to('cuda:0')
-            loss = self.loss_fn(state_h[-1][0], y, condition)
+            loss = self.loss_fn(output, y, condition)
 
             # scores = []
             # for query in run:
@@ -63,19 +75,29 @@ class LSTMTrainer():
             
             # return sum(scores) / len(query_ids)
 
-            # for i in range(1):
-            #     neg_idx = random.randint(0, len(X_train) - 1)
+            for j in range(1):
+                neg_idx = random.randint(0, len(X_train) - 1)
                 
-            #     if neg_idx == i: continue
+                if neg_idx == j: continue
 
-            #     x_neg_query = X_train[neg_idx]
-            #     x_neg = x_neg_query['encoding']
-            #     x_neg_query_id = x_neg_query['query_id']
-            #     y_neg = self.corpus[self.id_int_map[self.query_webpage_map[x_neg_query_id]]]
+                x_neg_query = X_train[neg_idx]
+                x_neg = x_neg_query['encoding']
+                x_neg_query_id = x_neg_query['query_id']
+                y_neg = self.corpus[self.id_int_map[self.query_webpage_map[x_neg_query_id]]]
 
-            #     state_h, state_c = self.model.init_state(len(x_neg))
-            #     state_h = state_h.to('cuda:0')
-            #     state_c = state_c.to('cuda:0')
+                state_h, state_c = self.model.init_state(len(x_neg))
+                state_h = state_h.to('cuda:0')
+                state_c = state_c.to('cuda:0')
+
+                if x_neg.size()[0] == 1:
+                   output = self.model(torch.unsqueeze(x_neg, 1), (state_h, state_c), x_neg[-1])
+                else:
+                   output = self.model(torch.unsqueeze(x_neg[:-1], 1), (state_h, state_c), x_neg[-1])
+                
+                condition = torch.tensor(-1).to('cuda:0')
+                loss += self.loss_fn(output, y_neg, condition)
+
+
 
             #     pred, (state_h, state_c) = self.model(torch.unsqueeze(x_neg, 1), (state_h, state_c))
 
@@ -95,8 +117,8 @@ class LSTMTrainer():
             self.optimizer.step()
             total_loss += loss.item()
 
-            #if i % 1000 == 999:
-            #    print('Inner loss: ', total_loss / (i*self.neg_samples))
+            if i % 10000 == 999:
+                print('Inner loss: ', total_loss / (i*self.neg_samples))
         
         return total_loss / len(X_train)
 
@@ -123,12 +145,15 @@ class LSTMTrainer():
             state_h = state_h.to('cuda:0')
             state_c = state_c.to('cuda:0')
 
-            pred, (state_h, state_c) = self.model(torch.unsqueeze(x, 1), (state_h, state_c))
-
+            if x.size()[0] == 1:
+                output = self.model(torch.unsqueeze(x, 1), (state_h, state_c), x[-1])
+            else:
+                output = self.model(torch.unsqueeze(x[:-1], 1), (state_h, state_c), x[-1])
+            
             condition = torch.tensor(1).to('cuda:0')
-            loss = self.loss_fn(state_h[-1][0], y, condition)
+            loss = self.loss_fn(output, y, condition)
 
-            encoded_query = pred[-1].squeeze()
+            encoded_query = output
 
             scores = util.cos_sim(encoded_query, just_corpus_encodings)[0]
             top_results = torch.topk(scores, k=1)
