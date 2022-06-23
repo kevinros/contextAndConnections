@@ -1,6 +1,8 @@
 # Context and Connections
 An analysis of hyperlink mentions on the Internet.
 
+# THIS FILE IS OUT OF DATE - NEED TO UPDATE
+
 ## Data file structure
 You'll need to make the directories (starred)
 ```
