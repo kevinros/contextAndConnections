@@ -7,11 +7,7 @@ from models import lstm
 import torch
 
 # example usage
-<<<<<<< HEAD
-# python3 lstm_preencoded.py --index_map data_2017-09/encoded_webpages/int_id_map_webpages_2022-06-02_21-24-49.pkl --relevance_scores data_2017-09/queries/relevance_scores.txt --corpus data_2017-09/encoded_webpages/webpages_2022-06-02_21-24-49.pkl --queries_train data_2017-09/queries/queries_train_2022-06-02_21-24-49_percomment.pkl --queries_val data_2017-09/queries/queries_val_2022-06-02_21-24-49_percomment.pkl --out out/lstm_preencoded_runs/
-=======
 # python3 lstm_preencoded.py --relevance_scores data_2017-09/queries/relevance_scores.txt --corpus data_2017-09/encoded_webpages/webpages.pkl --queries_train data_2017-09/queries/queries_train.pkl --queries_val data_2017-09/queries/queries_val.pkl --out out/lstm_runs/ --index_map data_2017-09/encoded_webpages/int_id_map_webpages.pkl --setting full
->>>>>>> 019a1068b94790ac06edba66901bf1fe9ab9781f
 
 class MarginMSELoss(nn.Module):
     def __init__(self, similarity_fct=util.pairwise_dot_score):
