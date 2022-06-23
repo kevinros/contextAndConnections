@@ -36,7 +36,7 @@ if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = "4,5,6,7"
 
     queries_train = pickle.load(open(args.queries_train, 'rb'))
-    queries_val= pickle.load(open(args.queries_val, 'rb'))
+    queries_val = pickle.load(open(args.queries_val, 'rb'))
     corpus = pickle.load(open(args.corpus, 'rb'))
     int_id_map = pickle.load(open(args.index_map, 'rb'))
     id_int_map = {value:key for key,value in int_id_map.items()}
@@ -53,6 +53,7 @@ if __name__ == '__main__':
         split_line = line.split()
         query_webpage_map[split_line[0]] = split_line[2]
 
+    # parameters
     input_size = 768
     hidden_size = 768
     num_layers = 1

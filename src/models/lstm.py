@@ -3,7 +3,6 @@ import torch
 import random
 from sentence_transformers import util
 
-
 class URLSTM(nn.Module):
     def __init__(self, input_size, hidden_size, num_layers):
         super(URLSTM, self).__init__()
