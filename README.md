@@ -1,10 +1,6 @@
 # Recommending Webpages to Online Discussion Forums
 This project explores the feasibility of recommending webpages to online discussion forums. The instructions below detail how to download the data, set up the models, and reproduce the experimental results. 
 
-## Description of files
-``src/data_helpers`` is the code used to build the comment chains and collect the webpages. See ``src/data_helpers/setup.txt`` for how to do so. If you only want the processed data, then see the next section. 
-
-
 ## Getting the processed data
 The data is publicly available for download from [Google Drive](https://drive.google.com/drive/folders/1waiWBRrwuNh3tp1b8mzrCNyR-SJ8yiuy?usp=sharing). After download and extraction, you should have the following files:
 
@@ -31,8 +27,9 @@ src
 |___|____RC_2017-09
 ```
 
+## Getting data from scratch
 
-## File structure descriptions and setup for running from scratch
+### File structure descriptions and setup
 See ``src/data_helpers/setup.txt`` for instructions. For ease of use, you can make the file structure look something like this:
 ```
 src
@@ -44,7 +41,8 @@ src
 |___|____webpages
 |___|____RC_2017-09
 ```
-### Getting data from scratch
+
+### Processing data
 Navigate to data helpers directory: ```cd src/data_helpers```
 
 Follow directions in setup.txt to download Reddit data. Then go through the following:
