@@ -1,4 +1,4 @@
-# Recommending Webpages to Online Discussion Forums
+# Recommending Relevant Webpages to Online Discussion Forums
 This project explores the feasibility of recommending webpages to online discussion forums. The instructions below detail how to download the data, set up the models, and reproduce the experimental results. 
 
 ## Getting the processed data
