@@ -87,5 +87,5 @@ Run Semantic baseline: use ``src/semantic_baseline.py``
 
 Run Semantic finetune: use ``src/semantic_finetune.py``
 
-Evaluate: any run output: see ``src/eval/evaluate.ipynb``
+Evaluate: see ``src/eval/evaluate.ipynb``
 
