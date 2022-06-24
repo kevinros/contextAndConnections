@@ -19,6 +19,7 @@ The data is publicly available for download from [Google Drive](https://drive.go
 
 For ease of use, you can then set up the following file structure:
 
+```
 src
 |___data_2017-09
 |___|____pyserini --> empty dir for Pyserini indexing
@@ -28,7 +29,7 @@ src
 |___|____webpages
 |___|___|___{webpage_id}.json --> all webpage files
 |___|____RC_2017-09
-
+```
 
 
 ## File structure descriptions and setup for running from scratch
