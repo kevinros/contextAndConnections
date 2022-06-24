@@ -9,7 +9,7 @@ import signal
 import argparse
 import random
 
-# example run 
+# How to run:
 # python3 scrape_urls.py --min_length 2 --data_path ../data_2017-09/ --url_file_map ../data_2017-09/url_file_map.pkl
 
 class TimeoutException(Exception):

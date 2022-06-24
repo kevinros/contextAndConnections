@@ -7,12 +7,6 @@ import os
 
 # example usage
 
-# not used
-# python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_baseline.pkl --index_map data_2017-09/encoded_webpages/int_id_map_webpages_baseline.pkl --queries data_2017-09/queries/queries_val.pkl --out out/semantic_runs/run.val_full_cos.txt
-# python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_baseline.pkl --index_map data_2017-09/encoded_webpages/int_id_map_webpages_baseline.pkl --queries data_2017-09/queries_onlylast/queries_val.pkl --out out/semantic_runs/run.val_onlylast_cos.txt
-# python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_baseline.pkl --index_map data_2017-09/encoded_webpages/int_id_map_webpages_baseline.pkl --queries data_2017-09/queries_removelast/queries_val.pkl --out out/semantic_runs/run.val_removelast_cos.txt
-
-
 # for semantic finetune, make sure to change data to correspond to model
 # for validation data
 # python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_2022-06-01_12-04-50.pkl --index_map data_2017-09/encoded_webpages/int_id_map_webpages_2022-06-01_12-04-50.pkl --queries data_2017-09/queries/queries_val_2022-06-01_12-04-50.pkl --out out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries-2022-06-01_12-04-50/eval/run.val_full.txt
@@ -34,6 +28,12 @@ import os
 # python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_msmarco-distilbert-cos-v5.pkl --index_map data_2017-09/encoded_webpages/int_id_map_webpages_msmarco-distilbert-cos-v5.pkl --queries data_2017-09/queries/queries_test_cos.pkl --out out/semantic_runs/v2_run.test_full_msmarco-distilbert-cos-v5.txt
 # python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_msmarco-distilbert-cos-v5.pkl --index_map data_2017-09/encoded_webpages/int_id_map_webpages_msmarco-distilbert-cos-v5.pkl --queries data_2017-09/queries_onlylast/queries_test_cos.pkl --out out/semantic_runs/v2_run.test_onlylast_msmarco-distilbert-cos-v5.txt
 # python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_msmarco-distilbert-cos-v5.pkl --index_map data_2017-09/encoded_webpages/int_id_map_webpages_msmarco-distilbert-cos-v5.pkl --queries data_2017-09/queries_removelast/queries_test_cos.pkl --out out/semantic_runs/run.test_removelast_msmarco-distilbert-cos-v5.txt
+
+
+# not used
+# python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_baseline.pkl --index_map data_2017-09/encoded_webpages/int_id_map_webpages_baseline.pkl --queries data_2017-09/queries/queries_val.pkl --out out/semantic_runs/run.val_full_cos.txt
+# python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_baseline.pkl --index_map data_2017-09/encoded_webpages/int_id_map_webpages_baseline.pkl --queries data_2017-09/queries_onlylast/queries_val.pkl --out out/semantic_runs/run.val_onlylast_cos.txt
+# python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_baseline.pkl --index_map data_2017-09/encoded_webpages/int_id_map_webpages_baseline.pkl --queries data_2017-09/queries_removelast/queries_val.pkl --out out/semantic_runs/run.val_removelast_cos.txt
 
 
 

@@ -5,10 +5,13 @@ from urllib.parse import urlparse
 import argparse
 
 
-# example run
+# How to run:
 # python3 format_reddit_comments.py --out_path ../data_2017-09/ --raw_reddit_data ../data_2017-09/RC_2017-09
 
 def extract_urls(comment_body, ignore_type={}, ignore_domains={}, valid_domains={}):
+    """
+    Given a comment, extracts all URLs
+    """
     cleaned_urls = []
     cleaned_valid_urls = []
     for url in re.findall(r'(https?://\S+-\n)?(?(1)([\S]*)|(https?://\S+))', comment_body):
@@ -34,6 +37,7 @@ def extract_urls(comment_body, ignore_type={}, ignore_domains={}, valid_domains=
 
         cleaned_urls.append(url)
 
+        # Filters for valid URLs
         if url[-3:] in ignore_type: continue
 
         if domain in ignore_domains: continue
@@ -117,7 +121,7 @@ if __name__ == '__main__':
                 all_needed_comments[comment_id] = comment['body']
 
 
-
+    # Save the data files
     pickle.dump(all_needed_comments, open(DATA_PATH + 'all_needed_comments.pkl', 'wb'))
     pickle.dump(valid_urls, open(DATA_PATH + 'valid_urls.pkl', 'wb'))
     pickle.dump(all_urls, open(DATA_PATH + 'all_urls.pkl', 'wb'))

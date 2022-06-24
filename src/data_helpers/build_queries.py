@@ -3,7 +3,7 @@ from multiprocessing import process
 import re
 import pickle
 
-# example run 
+# How to run (once per each setting) 
 # python3 build_queries.py --data_path ../data_2017-09/ --out ../data_2017-09/queries/ --mode all 
 # python3 build_queries.py --data_path ../data_2017-09/ --out ../data_2017-09/queries_onlylast/ --mode only_last
 # python3 build_queries.py --data_path ../data_2017-09/ --out ../data_2017-09/queries_removelast/ --mode remove_last 
@@ -16,7 +16,7 @@ def process_query(src: list, url: str, mode='all') -> str:
         src = src[:-1]
     else:
         # add heuristic for removing mobile wiki urls, too
-        # to reproduce old results, just comment out this block
+        # done later, which is why this has been added here
         if 'wikipedia' in url:
             url_mobile = url[:11] + 'm.' + url[11:]
             src[-1] = re.sub(re.escape(url_mobile), ' ', src[-1])
@@ -65,6 +65,8 @@ if __name__ == '__main__':
     relevance_scores = []
 
     for url in url_file_map:
+
+        # Ignore all urls that have not been successfully scraped
         if 'status' not in url_file_map[url] or url_file_map[url]['status'] != "success": continue
 
 

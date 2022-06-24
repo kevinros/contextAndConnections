@@ -5,24 +5,24 @@ from sentence_transformers import SentenceTransformer
 import pickle
 import os
 
-# example runs
+# For Semantic Baseline
 
-# for the semantic baseline validation runs
+# validation runs
 # python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_val.tsv --out ../data_2017-09/queries/queries_val_cos.pkl --model msmarco-distilbert-cos-v5 --model_name msmarco-distilbert-cos-v5
 # python3 encode_dataset.py --query_path ../data_2017-09/queries_onlylast/queries_val.tsv --out ../data_2017-09/queries_onlylast/queries_val_cos.pkl --model msmarco-distilbert-cos-v5 --model_name msmarco-distilbert-cos-v5
 # python3 encode_dataset.py --query_path ../data_2017-09/queries_removelast/queries_val.tsv --out ../data_2017-09/queries_removelast/queries_val_cos.pkl --model msmarco-distilbert-cos-v5 --model_name msmarco-distilbert-cos-v5
 
-# for the semantic baseline test runs
+# test runs
 # python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_test.tsv --out ../data_2017-09/queries/queries_test_cos.pkl --model msmarco-distilbert-cos-v5 --model_name msmarco-distilbert-cos-v5
 # python3 encode_dataset.py --query_path ../data_2017-09/queries_onlylast/queries_test.tsv --out ../data_2017-09/queries_onlylast/queries_test_cos.pkl --model msmarco-distilbert-cos-v5 --model_name msmarco-distilbert-cos-v5
 # python3 encode_dataset.py --query_path ../data_2017-09/queries_removelast/queries_test.tsv --out ../data_2017-09/queries_removelast/queries_test_cos.pkl --model msmarco-distilbert-cos-v5 --model_name msmarco-distilbert-cos-v5
 
-# for the semantic baseline webpage encodings
+# webpage encodings
 # python3 encode_dataset.py --webpages_path ../data_2017-09/webpages/ --out ../data_2017-09/encoded_webpages/ --model msmarco-distilbert-cos-v5 --model_name msmarco-distilbert-cos-v5
 
 
 
-# the following are for semantic finetune, make sure to change data to correspond to model, and make sure to change out to match full,last,proactive
+# the following are for semantic finetune, make sure to change data to correspond to model, and make sure to change out to match full,last,onlylast
 # full
 # python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_val.tsv --out ../data_2017-09/queries/queries_val_2022-06-01_12-04-50.pkl --model_name 2022-06-01_12-04-50 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries-2022-06-01_12-04-50
 # python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_test.tsv --out ../data_2017-09/queries/queries_test_2022-06-01_12-04-50.pkl --model_name 2022-06-01_12-04-50 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries-2022-06-01_12-04-50
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--query_path', help="path to query tsv file")
     parser.add_argument('--webpages_path', help="path webpage directory")
-    parser.add_argument('--model', help="path to model")
+    parser.add_argument('--model', help="path to sentencetransformer model")
     parser.add_argument('--model_name', help="name to help distinguish encoding files")
     parser.add_argument('--out', help='path to save encodings')
     parser.add_argument('--per_comment', help='used for LSTM, if true, will return a list of individually embedded comments')

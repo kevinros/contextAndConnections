@@ -1,31 +1,50 @@
-# Context and Connections
-An analysis of hyperlink mentions on the Internet.
+# Recommending Webpages to Online Discussion Forums
+This project explores the feasibility of recommending webpages to online discussion forums. The instructions below detail how to download the data, set up the models, and reproduce the experimental results. 
 
-# THIS FILE IS OUT OF DATE - NEED TO UPDATE
+## Description of files
+``src/data_helpers`` is the code used to build the comment chains and collect the webpages. See ``src/data_helpers/setup.txt`` for how to do so. If you only want the processed data, then see the next section. 
 
-## Data file structure
-You'll need to make the directories (starred)
+
+## Getting the processed data
+The data is publicly available for download from [Google Drive](https://drive.google.com/drive/folders/1waiWBRrwuNh3tp1b8mzrCNyR-SJ8yiuy?usp=sharing). After download and extraction, you should have the following files:
+
+1. ``webpages``, which contains the complete collected webpage corpus for our experiments. Each webpage is its own json file, and it contains two fields: ``id`` which is the same as the filename, uniquely identifying the webpage, and ``contents``, which is the scraped text.  
+2. ``queries`` which should contain ``queries_{train,val,test}.tsv``,  ``url_file_map.pkl``, and ``relevance_scores.txt``. 
+
+``queries_{train,val,test}.tsv``: contains the train/dev/test splits for the Full setting. The first item on each line is the query id, and the second item on each line is the comment chain, where each comment is separted by <C>. Note that only the Full setting is included, but creating the Last setting (keeping only the last comment) or the Proactive setting (removing the last comment) can be done easily. 
+
+``url_file_map.pkl``: maps a url to the file name in ``webpages``. The dictionary map also contains status (if the URL was successful), the comment ids in the chains from the original Reddit data, and whether the URL is in the train/dev/test split.
+
+``relevance_scores.txt``: trec style relevance judgements for each query id. Maps to a webpage id. 
+
+For ease of use, you can then set up the following file structure:
+
+src
+|___data_2017-09
+|___|____pyserini --> empty dir for Pyserini indexing
+|___|____queries
+|___|___|___queries_{train,val,test}.tsv
+|___|___|___relevance_scores.txt
+|___|____webpages
+|___|___|___{webpage_id}.json --> all webpage files
+|___|____RC_2017-09
+
+
+
+## File structure descriptions and setup for running from scratch
+See ``src/data_helpers/setup.txt`` for instructions. For ease of use, you can make the file structure look something like this:
 ```
-data_2017-09
-|____**encoded_queries**
-|   |   queries_{train,val,test}.pkl
-|____**encoded_webpages**
-|   |   webpages.pkl
-|____**pyserini**
-|   |   files automatically created when bm25_baseline.ipynb is ran
-|____**queries**
-|   |   queries_{train,val,test}.tsv
-|____**webpages**
-|   |   {webpage_id}.json
-|____all_needed_comments.pkl
-|____all_urls.pkl
-|____RC_2017-09
-|____url_file_map.pkl
-|____valid_urls.pkl
+src
+|___data_2017-09
+|___|____pyserini
+|___|____queries
+|___|____queries_onlylast
+|___|____queries_removelast
+|___|____webpages
+|___|____RC_2017-09
 ```
-## Setting up data
-
-Navigate to data helpers directory: ```cd data_helpers```
+### Getting data from scratch
+Navigate to data helpers directory: ```cd src/data_helpers```
 
 Follow directions in setup.txt to download Reddit data. Then go through the following:
 
@@ -38,56 +57,35 @@ This will create
 
 Now, we can use the ids in the chains of ```valid_urls.pkl``` and ```all_needed_comments.pkl``` to reconstruct comment threads
 
-Scrape URLs: ```python3 scrape_urls.py --min_length 2 --data_path ../data_2017-09/```
+Scrape URLs: ```python3 scrape_urls.py --min_length 2 --data_path ../data_2017-09/ --url_file_map ../data_2017-09/url_file_map.pkl```
 
 This will create
-1. A collection of scraped webpage text in the ```webpages``` directory (created in setup.txt). Each webpage will have a unique file name and be formatted as a json (matching the expected input for pyserini)
+1. A collection of scraped webpage text in the ```webpages``` directory (empty dir should have been created in setup.txt). Each webpage will have a unique file name and be formatted as a json (matching the expected input for Pyserini)
 2. ```url_file_map.pkl``` A dictionary that maps a URL to ```{'filename': name of file in webpages, 'chains': list of comment chains ending with that url, 'status': whether or not the page was successfully scraped, 'split': train, val, or test}```
 
-Next, we can build our queries and relevance score file: ```python3 build_queries.py --data_path ../data_2017-09/ --out ../data_2017-09/queries/```
+Next, we can build our queries and relevance score file: 
+```python3 build_queries.py --data_path ../data_2017-09/ --out ../data_2017-09/queries/ --mode all```
+
+```python3 build_queries.py --data_path ../data_2017-09/ --out ../data_2017-09/queries_onlylast/ --mode only_last```
+
+```python3 build_queries.py --data_path ../data_2017-09/ --out ../data_2017-09/queries_removelast/ --mode remove_last```
 
 This will create
-1. A train/val/test tsv split of plaintext comment chains in the ```queries``` directory (created in setup.txt). Each comment will be separated by a <C> tag.
-2. ```relevance_scores.txt``` in the ```queries``` directory. Each line maps a query id to a relevant webpage filename. 
+1. A train/val/test tsv split of plaintext comment chains in the ```queries / queries_onlylast / queries_removelast``` directory (created in setup.txt). Each comment will be separated by a <C> tag.
+2. ```relevance_scores.txt```. Each line maps a query id to a relevant webpage filename. 
 
 
-To pre-encode the queries and webpages for the semantic baseline and the preencoded lstm:
-
-```python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_train.tsv --out ../data_2017-09/encoded_queries/queries_train.pkl```
-
-```python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_val.tsv --out ../data_2017-09/encoded_queries/queries_val.pkl```
-
-```python3 encode_dataset.py --webpages_path ../data_2017-09/webpages/ --out ../data_2017-09/encoded_webpages/webpages.pkl```
-
+To pre-encode the queries and webpages for the semantic baseline runs, see ``src/data_helpers/encode_dataset.py``:
 
 ## Training and evaluating the models
 
 Assume you are in src directory
 
-Run BM25 baseline: use bm25_baseline.ipynb
+Run BM25 baseline: use ``src/bm25_baseline.ipynb``
 
-Run Semantic baseline: ```python3 semantic_baseline.py --corpus data_2017-09/encoded_webpages/webpages.pkl --queries data_2017-09/encoded_queries/queries_train.pkl --out out/semantic_runs/```
+Run Semantic baseline: use ``src/semantic_baseline.py``
 
-Run LSTM preencoded: ```python3 lstm_preencoded.py --relevance_scores data_2017-09/queries/relevance_scores.txt --corpus data_2017-09/encoded_webpages/webpages.pkl --queries_train data_2017-09/encoded_queries/queries_train.pkl --queries_val data_2017-09/encoded_queries/queries_val.pkl --out out/lstm_preencoded_runs/```
+Run Semantic finetune: use ``src/semantic_finetune.py``
 
-Run Semantic finetune: ```python3 semantic_finetune.py --corpus data_2017-09/webpages/ --queries data_2017-09/queries/```
-
-Evaluate: ```python3 -m pyserini.eval.trec_eval -m map -m P.1 <path to relevance scores> <path to run>```
-
-
-
-## TODO
-- [x] Add more domains to the data set
-- [x] Try with newer reddit comments
-- [x] Address scrape error to restrict scraped domains to only those selected, not ones present in comments
-- [x] Semantic search baseline
-- [x] Rerun comment gathering code to ignore mobile link bots
-- [ ] Add transformer code to src (maybe can leverage sbert with no pretrained model?)
-- [ ] Manually inspect some scraped websites and processed queries --> is the text clean enough??
-- [ ] Do a full scrape, then get scores for all of the models
-- [ ] Make test functions search over faiss instead of loading everything at once (only a problem with scale?)
-- [ ] Use teacher to enforce negative samples with the margin (see [paper](https://arxiv.org/pdf/2010.02666.pdf), [code](https://github.com/UKPLab/sentence-transformers/blob/40af04ed70e16408f466faaa5243bee6f476b96e/examples/training/ms_marco/train_bi-encoder_mnrl.py#L149))
-- [ ] Proper data loading, batch size for LSTM
-- [ ] Add data parallel wrappers
-- [ ] Use model files and place all hyper parameters in there
+Evaluate: any run output: see ``src/eval/evaluate.ipynb``
 
