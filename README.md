@@ -2,7 +2,7 @@
 This project explores the feasibility of recommending webpages to online discussion forums. The instructions below detail how to download the data, set up the models, and reproduce the experimental results. 
 
 ## Getting the processed data
-The data is publicly available for download from [Google Drive, approximately 3GB uncompressed](https://drive.google.com/drive/folders/1waiWBRrwuNh3tp1b8mzrCNyR-SJ8yiuy?usp=sharing). After download and extraction, you should have the following files:
+The data is publicly available for download from TBD. After download and extraction, you should have the following files:
 
 1. ``webpages``, which contains the complete collected webpage corpus for our experiments. Each webpage is its own json file, and it contains two fields: ``id`` which is the same as the filename, uniquely identifying the webpage, and ``contents``, which is the scraped text.  
 2. ``queries`` which should contain ``queries_{train,val,test}.tsv``,  ``url_file_map.pkl``, and ``relevance_scores.txt``. 
