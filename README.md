@@ -7,11 +7,11 @@ The data is publicly available for download from TBD. After download and extract
 1. ``webpages``, which contains the complete collected webpage corpus for our experiments. Each webpage is its own json file, and it contains two fields: ``id`` which is the same as the filename, uniquely identifying the webpage, and ``contents``, which is the scraped text.  
 2. ``queries`` which should contain ``queries_{train,val,test}.tsv``,  ``url_file_map.pkl``, and ``relevance_scores.txt``. 
 
-``queries_{train,val,test}.tsv``: contains the train/dev/test splits for the Full setting. The first item on each line is the query id, and the second item on each line is the comment chain, where each comment is separted by <C>. Note that only the Full setting is included, but creating the Last setting (keeping only the last comment) or the Proactive setting (removing the last comment) can be done easily. 
+``queries_{train,val,test}.tsv``: contains the train/dev/test splits for the Full setting. The first item on each line is the query id, and the second item on each line is the comment chain, where each comment is separated by <C>. Note that only the Full setting is included, but creating the Last setting (keeping only the last comment) or the Proactive setting (removing the last comment) can be done easily. 
 
 ``url_file_map.pkl``: maps a url to the file name in ``webpages``. The dictionary map also contains status (if the URL was successful), the comment ids in the chains from the original Reddit data, and whether the URL is in the train/dev/test split.
 
-``relevance_scores.txt``: trec style relevance judgements for each query id. Maps to a webpage id. 
+``relevance_scores.txt``: trec style relevance judgments for each query id. Maps to a webpage id. 
 
 For ease of use, you can then set up the following file structure:
 
