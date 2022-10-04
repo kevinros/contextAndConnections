@@ -55,4 +55,4 @@ def write_out(ds, files):
           if im < 0:
               f.write(files[i] + ", " + files[i] +"\n")
           else:
-              f.write(files[i] + ", " + files[im] +"\n")
+              f.write(files[i] + ", " + ds.query(files[im]) +"\n")
