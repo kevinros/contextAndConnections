@@ -55,4 +55,14 @@ def write_out(ds, files):
           if im < 0:
               f.write(files[i] + ", " + files[i] +"\n")
           else:
-              f.write(files[i] + ", " + ds.query(files[im]) +"\n")
+              f.write(files[i] + ", " + files[ds.query(im)] +"\n")
+
+def write_out_queries(ds, di):
+    indices = list(pd.read_csv(di + "/queries_train.tsv", delimiter = "\t", names=["n", "text"])["n"]) + list(pd.read_csv(di + "/queries_val.tsv", delimiter = "\t", names=["n", "text"])["n"]) + list(pd.read_csv(di + "/queries_test.tsv", delimiter = "\t", names=["n", "text"])["n"])
+    with open("clusters_queries.csv", "w+") as f:
+        f.write("global index, cluster\n")
+          for i, im in enumerate(ds.vals):
+              if im < 0:
+                  f.write(indices[i] + ", " + indices[i] +"\n")
+              else:
+                  f.write(indices[i] + ", " + indices[ds.query(im)] +"\n")
