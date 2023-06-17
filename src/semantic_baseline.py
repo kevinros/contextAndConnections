@@ -35,9 +35,6 @@ import os
 # python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_baseline.pkl --index_map data_2017-09/encoded_webpages/int_id_map_webpages_baseline.pkl --queries data_2017-09/queries_onlylast/queries_val.pkl --out out/semantic_runs/run.val_onlylast_cos.txt
 # python3 semantic_baseline.py --index data_2017-09/encoded_webpages/webpages_baseline.pkl --index_map data_2017-09/encoded_webpages/int_id_map_webpages_baseline.pkl --queries data_2017-09/queries_removelast/queries_val.pkl --out out/semantic_runs/run.val_removelast_cos.txt
 
-
-
-
 def semantic_baseline(index, int_id_map, queries, k=10):
     run = []
 
@@ -82,6 +79,8 @@ if __name__ == '__main__':
 
     hits = util.semantic_search(queries, corpus, score_function=util.dot_score)
     #hits = util.semantic_search(queries, corpus, score_function=util.cos_sim)
+
+
     run = []
     for i,query in enumerate(hits):
         for j, result in enumerate(query):

@@ -39,7 +39,6 @@ import os
 # python3 encode_dataset.py --webpages_path ../data_2017-09/webpages/ --out ../data_2017-09/encoded_webpages/ --model_name 2022-05-22_18-44-28 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries_removelast-2022-05-22_18-44-28
 
 
-
 # onlylast model but full, however per comment (for LSTM)
 # python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_train.tsv --out ../data_2017-09/queries/queries_train_2022-06-02_21-24-49_percomment.pkl --model_name 2022-06-02_21-24-49 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries_onlylast-2022-06-02_21-24-49 --per_comment True
 # python3 encode_dataset.py --query_path ../data_2017-09/queries/queries_val.tsv --out ../data_2017-09/queries/queries_val_2022-06-02_21-24-49_percomment.pkl --model_name 2022-06-02_21-24-49 --model ../out/semantic_finetune_runs/train_bi-encoder-mnrl-msmarco-distilbert-cos-v5-queries_onlylast-2022-06-02_21-24-49 --per_comment True

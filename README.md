@@ -1,31 +1,6 @@
 # Recommending Relevant Webpages to Online Discussion Forums
 This project explores the feasibility of recommending webpages to online discussion forums. The instructions below detail how to download the data, set up the models, and reproduce the experimental results. 
 
-## Getting the processed data
-The data is publicly available for download from TBD. After download and extraction, you should have the following files:
-
-1. ``webpages``, which contains the complete collected webpage corpus for our experiments. Each webpage is its own json file, and it contains two fields: ``id`` which is the same as the filename, uniquely identifying the webpage, and ``contents``, which is the scraped text.  
-2. ``queries`` which should contain ``queries_{train,val,test}.tsv``,  ``url_file_map.pkl``, and ``relevance_scores.txt``. 
-
-``queries_{train,val,test}.tsv``: contains the train/dev/test splits for the Full setting. The first item on each line is the query id, and the second item on each line is the comment chain, where each comment is separated by <C>. Note that only the Full setting is included, but creating the Last setting (keeping only the last comment) or the Proactive setting (removing the last comment) can be done easily. 
-
-``url_file_map.pkl``: maps a url to the file name in ``webpages``. The dictionary map also contains status (if the URL was successful), the comment ids in the chains from the original Reddit data, and whether the URL is in the train/dev/test split.
-
-``relevance_scores.txt``: trec style relevance judgments for each query id. Maps to a webpage id. 
-
-For ease of use, you can then set up the following file structure:
-
-```
-src
-|___data_2017-09
-|___|____pyserini --> empty dir for Pyserini indexing
-|___|____queries
-|___|___|___queries_{train,val,test}.tsv
-|___|___|___relevance_scores.txt
-|___|____webpages
-|___|___|___{webpage_id}.json --> all webpage files
-|___|____RC_2017-09
-```
 
 ## Getting data from scratch
 
@@ -75,6 +50,33 @@ This will create
 
 
 To pre-encode the queries and webpages for the semantic baseline runs, see ``src/data_helpers/encode_dataset.py``:
+
+## Getting the processed data
+The data is available for research. Please email kjros2@illinois.edu for the download links. 
+
+1. ``webpages``, which contains the complete collected webpage corpus for our experiments. Each webpage is its own json file, and it contains two fields: ``id`` which is the same as the filename, uniquely identifying the webpage, and ``contents``, which is the scraped text.  
+2. ``queries`` which should contain ``queries_{train,val,test}.tsv``,  ``url_file_map.pkl``, and ``relevance_scores.txt``. [Download link]()
+
+``queries_{train,val,test}.tsv``: contains the train/dev/test splits for the Full setting. The first item on each line is the query id, and the second item on each line is the comment chain, where each comment is separated by <C>. Note that only the Full setting is included, but creating the Last setting (keeping only the last comment) or the Proactive setting (removing the last comment) can be done easily. 
+
+``url_file_map.pkl``: maps a url to the file name in ``webpages``. The dictionary map also contains status (if the URL was successful), the comment ids in the chains from the original Reddit data, and whether the URL is in the train/dev/test split.
+
+``relevance_scores.txt``: trec style relevance judgments for each query id. Maps to a webpage id. 
+
+For ease of use, you can then set up the following file structure:
+
+```
+src
+|___data_2017-09
+|___|____pyserini --> empty dir for Pyserini indexing
+|___|____queries
+|___|___|___queries_{train,val,test}.tsv
+|___|___|___relevance_scores.txt
+|___|____webpages
+|___|___|___{webpage_id}.json --> all webpage files
+|___|____RC_2017-09
+```
+
 
 ## Training and evaluating the models
 

@@ -7,7 +7,7 @@ def load_rel_scores(path_to_rel_scores):
             relevance_scores[split_line[0]] = split_line[2]
     return relevance_scores
 
-def load_run(path_to_run):
+def load_run(path_to_run, with_scores=False):
     # map from queryid to list of ordered webpages
     run = {}
     with open(path_to_run, 'r') as f:
@@ -16,7 +16,10 @@ def load_run(path_to_run):
             query_id = line[0]
             if query_id not in run:
                 run[query_id] = []
-            run[query_id].append(line[2])
+            if with_scores:
+                run[query_id].append((line[2], line[4]))
+            else:
+                run[query_id].append(line[2])
     return run
     
 # pyserini returns nothing for comments that are removed
